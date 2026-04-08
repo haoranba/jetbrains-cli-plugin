@@ -17,3 +17,9 @@ build/
 # Temp
 tmp/
 .qodana/
+
+# Claude
+.claude/
+
+# Other
+local.properties
