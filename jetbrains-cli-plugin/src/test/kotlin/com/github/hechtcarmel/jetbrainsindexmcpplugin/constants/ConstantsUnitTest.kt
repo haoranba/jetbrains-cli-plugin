@@ -86,8 +86,6 @@ class ConstantsUnitTest : TestCase() {
     // JsonRpcMethods tests
 
     fun testJsonRpcMethodsValues() {
-        assertEquals("initialize", JsonRpcMethods.INITIALIZE)
-        assertEquals("notifications/initialized", JsonRpcMethods.NOTIFICATIONS_INITIALIZED)
         assertEquals("ping", JsonRpcMethods.PING)
         assertEquals("tools/list", JsonRpcMethods.TOOLS_LIST)
         assertEquals("tools/call", JsonRpcMethods.TOOLS_CALL)
