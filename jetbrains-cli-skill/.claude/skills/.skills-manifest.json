@@ -1,0 +1,12 @@
+{
+  "skills": {
+    "@antskill/jetbrains-cli": {
+      "version": "1.0.0",
+      "installedAt": "2026-04-08T21:56:56.842Z",
+      "package": "@antskill/jetbrains-cli",
+      "path": "/Users/syd/context/jetbrains-cli/jetbrains-cli-skill/.claude/skills/jetbrains-cli",
+      "target": "claude-code",
+      "skillName": "jetbrains-cli"
+    }
+  }
+}

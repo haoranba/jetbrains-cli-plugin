@@ -1,0 +1,33 @@
+{
+  "name": "@antskill/jetbrains-cli",
+  "version": "1.0.0",
+  "description": "CLI tool for JetBrains IDE code intelligence via MCP - semantic search, navigation, refactoring, and diagnostics",
+  "scripts": {
+    "postinstall": "agent-skill-installer install",
+    "preuninstall": "agent-skill-installer uninstall",
+    "test": "agent-skill-installer install --dry-run"
+  },
+  "dependencies": {
+    "@agentskill/installer": "^1.0.0"
+  },
+  "files": [
+    "SKILL.md",
+    "references/",
+    "scripts/",
+    ".claude-skill.json"
+  ],
+  "keywords": [
+    "claude-code",
+    "skill",
+    "jetbrains",
+    "intellij",
+    "mcp",
+    "code-intelligence",
+    "refactoring"
+  ],
+  "author": "尚之",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.antgroup-inc.cn"
+  }
+}
