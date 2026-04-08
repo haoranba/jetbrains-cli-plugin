@@ -1,6 +1,5 @@
 package com.github.hechtcarmel.jetbrainsindexmcpplugin.server
 
-import com.github.hechtcarmel.jetbrainsindexmcpplugin.McpConstants
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.constants.ErrorMessages
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.constants.JsonRpcMethods
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.constants.ParamNames
@@ -13,6 +12,14 @@ import com.intellij.openapi.diagnostic.logger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 
+/**
+ * Simplified JSON-RPC handler for CLI access.
+ *
+ * Supports only:
+ * - tools/list - List all available tools
+ * - tools/call - Execute a tool
+ * - ping - Health check
+ */
 class JsonRpcHandler(
     private val toolRegistry: ToolRegistry
 ) {
@@ -27,13 +34,7 @@ class JsonRpcHandler(
         private val LOG = logger<JsonRpcHandler>()
     }
 
-    suspend fun handleRequest(jsonString: String): String? =
-        handleRequest(jsonString, McpConstants.MCP_PROTOCOL_VERSION)
-
-    suspend fun handleRequest(
-        jsonString: String,
-        protocolVersion: String
-    ): String? {
+    suspend fun handleRequest(jsonString: String): String? {
         val request = try {
             json.decodeFromString<JsonRpcRequest>(jsonString)
         } catch (e: Exception) {
@@ -50,7 +51,7 @@ class JsonRpcHandler(
         }
 
         val response = try {
-            routeRequest(request, protocolVersion)
+            routeRequest(request)
         } catch (e: Exception) {
             LOG.error("Error processing request: ${request.method}", e)
             createErrorResponse(request.id, JsonRpcErrorCodes.INTERNAL_ERROR, e.message ?: "Unknown error")
@@ -59,34 +60,13 @@ class JsonRpcHandler(
         return response?.let { json.encodeToString(response) }
     }
 
-    private suspend fun routeRequest(request: JsonRpcRequest, protocolVersion: String): JsonRpcResponse? {
+    private suspend fun routeRequest(request: JsonRpcRequest): JsonRpcResponse? {
         return when (request.method) {
-            JsonRpcMethods.INITIALIZE -> processInitialize(request, protocolVersion)
-            JsonRpcMethods.NOTIFICATIONS_INITIALIZED -> null
             JsonRpcMethods.TOOLS_LIST -> processToolsList(request)
             JsonRpcMethods.TOOLS_CALL -> processToolCall(request)
             JsonRpcMethods.PING -> processPing(request)
             else -> createErrorResponse(request.id, JsonRpcErrorCodes.METHOD_NOT_FOUND, ErrorMessages.methodNotFound(request.method))
         }
-    }
-
-    private fun processInitialize(request: JsonRpcRequest, protocolVersion: String): JsonRpcResponse {
-        val result = InitializeResult(
-            protocolVersion = protocolVersion,
-            serverInfo = ServerInfo(
-                name = McpConstants.SERVER_NAME,
-                version = McpConstants.SERVER_VERSION,
-                description = McpConstants.SERVER_DESCRIPTION
-            ),
-            capabilities = ServerCapabilities(
-                tools = ToolCapability(listChanged = false)
-            )
-        )
-
-        return JsonRpcResponse(
-            id = request.id,
-            result = json.encodeToJsonElement(result)
-        )
     }
 
     private fun processToolsList(request: JsonRpcRequest): JsonRpcResponse {

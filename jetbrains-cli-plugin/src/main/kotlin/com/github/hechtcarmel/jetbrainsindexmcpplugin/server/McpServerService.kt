@@ -3,9 +3,7 @@ package com.github.hechtcarmel.jetbrainsindexmcpplugin.server
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.McpBundle
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.McpConstants
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.ServerStatusListener
-import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.transport.KtorMcpServer
-import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.transport.KtorSseSessionManager
-import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.transport.StreamableHttpSessionManager
+import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.transport.KtorServer
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.settings.McpSettings
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.settings.McpSettingsConfigurable
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.ToolRegistry
@@ -25,16 +23,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * Application-level service managing the MCP server infrastructure.
+ * Application-level service managing the server infrastructure for CLI access.
  *
  * This service manages:
  * - Embedded Ktor CIO server with configurable port
- * - Tool registry for MCP tools
+ * - Tool registry for all available tools
  * - JSON-RPC handler for message processing
- * - SSE session management for client connections
  * - Coroutine scope for non-blocking tool execution
- *
- * Uses HTTP+SSE transport for compatibility with MCP clients.
  */
 @Service(Service.Level.APP)
 class McpServerService(
@@ -43,9 +38,7 @@ class McpServerService(
 
     private val toolRegistry: ToolRegistry = ToolRegistry()
     private val jsonRpcHandler: JsonRpcHandler
-    private val sseSessionManager: KtorSseSessionManager = KtorSseSessionManager()
-    private val streamableHttpSessionManager: StreamableHttpSessionManager = StreamableHttpSessionManager()
-    private var ktorServer: KtorMcpServer? = null
+    private var ktorServer: KtorServer? = null
     private var serverError: ServerError? = null
 
     /**
@@ -67,7 +60,7 @@ class McpServerService(
     }
 
     init {
-        LOG.info("Initializing MCP Server Service (Protocol: ${McpConstants.MCP_PROTOCOL_VERSION})")
+        LOG.info("Initializing Server Service")
         jsonRpcHandler = JsonRpcHandler(toolRegistry)
         // Self-initialize asynchronously so the server starts even if postStartupActivity
         // doesn't fire (see issue #73). initialize() is idempotent (@Synchronized + isInitialized
@@ -79,7 +72,7 @@ class McpServerService(
     fun initialize() {
         if (isInitialized) return
 
-        LOG.info("Performing deferred MCP Server initialization")
+        LOG.info("Performing deferred Server initialization")
 
         toolRegistry.registerBuiltInTools()
 
@@ -89,39 +82,36 @@ class McpServerService(
         isInitialized = true
         startServer(host, port)
 
-        LOG.info("MCP Server Service initialized with Ktor CIO server")
+        LOG.info("Server Service initialized with Ktor CIO server")
     }
 
     /**
-     * Starts the MCP server on the specified port.
+     * Starts the server on the specified port.
      *
      * @param host The host to bind to
      * @param port The port to listen on
      * @return The result of the start operation
      */
-    fun startServer(host: String, port: Int): KtorMcpServer.StartResult {
+    fun startServer(host: String, port: Int): KtorServer.StartResult {
         // Stop existing server if running
         stopServer()
 
-        LOG.info("Starting MCP Server on $host:$port")
+        LOG.info("Starting Server on $host:$port")
 
-        val server = KtorMcpServer(
+        val server = KtorServer(
             port = port,
             host = host,
-            jsonRpcHandler = jsonRpcHandler,
-            sseSessionManager = sseSessionManager,
-            streamableHttpSessionManager = streamableHttpSessionManager,
-            coroutineScope = coroutineScope
+            jsonRpcHandler = jsonRpcHandler
         )
 
         val result = when (val startResult = server.start()) {
-            is KtorMcpServer.StartResult.Success -> {
+            is KtorServer.StartResult.Success -> {
                 ktorServer = server
                 serverError = null
-                LOG.info("MCP Server started successfully on $host:$port")
+                LOG.info("Server started successfully on $host:$port")
                 startResult
             }
-            is KtorMcpServer.StartResult.PortInUse -> {
+            is KtorServer.StartResult.PortInUse -> {
                 serverError = ServerError("Port $port is already in use", port)
                 showErrorNotification(
                     McpBundle.message("notification.serverPortInUse.title"),
@@ -129,9 +119,9 @@ class McpServerService(
                 )
                 startResult
             }
-            is KtorMcpServer.StartResult.Error -> {
+            is KtorServer.StartResult.Error -> {
                 serverError = ServerError(startResult.message)
-                LOG.warn("Failed to start MCP Server: ${startResult.message}", startResult.cause)
+                LOG.warn("Failed to start Server: ${startResult.message}", startResult.cause)
                 showErrorNotification(
                     McpBundle.message("notification.serverStartFailed.title"),
                     McpBundle.message("notification.serverStartFailed.content", startResult.message)
@@ -158,7 +148,7 @@ class McpServerService(
     }
 
     /**
-     * Stops the MCP server.
+     * Stops the server.
      */
     fun stopServer() {
         ktorServer?.stop()
@@ -166,14 +156,14 @@ class McpServerService(
     }
 
     /**
-     * Restarts the MCP server on a new host/port.
+     * Restarts the server on a new host/port.
      *
      * @param newHost The new host to bind to
      * @param newPort The new port to listen on
      * @return The result of the restart operation
      */
-    fun restartServer(newHost: String, newPort: Int): KtorMcpServer.StartResult {
-        LOG.info("Restarting MCP Server on $newHost:$newPort")
+    fun restartServer(newHost: String, newPort: Int): KtorServer.StartResult {
+        LOG.info("Restarting Server on $newHost:$newPort")
         return startServer(newHost, newPort)
     }
 
@@ -191,11 +181,8 @@ class McpServerService(
 
     fun getJsonRpcHandler(): JsonRpcHandler = jsonRpcHandler
 
-    fun getSseSessionManager(): KtorSseSessionManager = sseSessionManager
-
     /**
-     * Returns the Streamable HTTP endpoint URL for MCP connections (primary transport).
-     * Clients should use this URL for the MCP 2025-03-26 Streamable HTTP transport.
+     * Returns the server URL for CLI connections.
      *
      * @return The server URL, or null if server is not running
      */
@@ -204,20 +191,7 @@ class McpServerService(
         val settings = McpSettings.getInstance()
         val port = settings.serverPort
         val host = settings.serverHost
-        return "http://$host:$port${McpConstants.STREAMABLE_HTTP_ENDPOINT_PATH}"
-    }
-
-    /**
-     * Returns the legacy SSE endpoint URL for older MCP clients (2024-11-05 transport).
-     *
-     * @return The SSE URL, or null if server is not running
-     */
-    fun getLegacySseUrl(): String? {
-        if (ktorServer == null || serverError != null) return null
-        val settings = McpSettings.getInstance()
-        val port = settings.serverPort
-        val host = settings.serverHost
-        return "http://$host:$port${McpConstants.SSE_ENDPOINT_PATH}"
+        return "http://$host:$port/api"
     }
 
     /**
@@ -236,10 +210,7 @@ class McpServerService(
         return ServerStatusInfo(
             name = McpConstants.SERVER_NAME,
             version = McpConstants.SERVER_VERSION,
-            protocolVersion = McpConstants.MCP_PROTOCOL_VERSION,
-            streamableHttpUrl = if (isRunning) "http://$host:$port${McpConstants.STREAMABLE_HTTP_ENDPOINT_PATH}" else "Server not running",
-            legacySseUrl = if (isRunning) "http://$host:$port${McpConstants.SSE_ENDPOINT_PATH}" else "Server not running",
-            postUrl = "http://$host:$port${McpConstants.MCP_ENDPOINT_PATH}",
+            apiUrl = if (isRunning) "http://$host:$port/api" else "Server not running",
             port = port,
             registeredTools = toolRegistry.getAllTools().size,
             error = serverError?.message,
@@ -270,10 +241,8 @@ class McpServerService(
     }
 
     override fun dispose() {
-        LOG.info("Disposing MCP Server Service")
+        LOG.info("Disposing Server Service")
         stopServer()
-        sseSessionManager.closeAllSessions()
-        streamableHttpSessionManager.closeAllSessions()
     }
 }
 
@@ -283,10 +252,7 @@ class McpServerService(
 data class ServerStatusInfo(
     val name: String,
     val version: String,
-    val protocolVersion: String,
-    val streamableHttpUrl: String,
-    val legacySseUrl: String,
-    val postUrl: String,
+    val apiUrl: String,
     val port: Int,
     val registeredTools: Int,
     val error: String? = null,

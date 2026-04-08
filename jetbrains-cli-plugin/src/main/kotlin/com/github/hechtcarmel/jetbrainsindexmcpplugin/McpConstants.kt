@@ -25,20 +25,8 @@ object McpConstants {
      */
     const val DEFAULT_SERVER_PORT = 29170
 
-    // MCP Endpoint paths
-    const val MCP_ENDPOINT_PATH = "/index-mcp"
-    const val SSE_ENDPOINT_PATH = "$MCP_ENDPOINT_PATH/sse"
-    const val STREAMABLE_HTTP_ENDPOINT_PATH = "$MCP_ENDPOINT_PATH/streamable-http"
-    const val SESSION_ID_PARAM = "sessionId"
-    const val MCP_SESSION_ID_HEADER = "Mcp-Session-Id"
-
     // JSON-RPC version
     const val JSON_RPC_VERSION = "2.0"
-
-    // MCP Protocol versions
-    const val LEGACY_MCP_PROTOCOL_VERSION = "2024-11-05"
-    const val STREAMABLE_HTTP_MCP_PROTOCOL_VERSION = "2025-03-26"
-    const val MCP_PROTOCOL_VERSION = STREAMABLE_HTTP_MCP_PROTOCOL_VERSION
 
     // Server identification - IDE-specific
     /**
@@ -60,7 +48,7 @@ object McpConstants {
      */
     @JvmField
     val SERVER_STATUS_TOPIC: Topic<ServerStatusListener> = Topic.create(
-        "MCP Server Status",
+        "Server Status",
         ServerStatusListener::class.java
     )
 }

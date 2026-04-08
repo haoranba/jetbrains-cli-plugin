@@ -2,7 +2,7 @@ package com.github.hechtcarmel.jetbrainsindexmcpplugin.settings
 
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.McpBundle
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.McpConstants
-import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.transport.KtorMcpServer
+import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.transport.KtorServer
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.McpServerService
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
@@ -233,7 +233,7 @@ class McpSettingsConfigurable : Configurable {
                 if (!mcpService.isInitialized) return@invokeLater
                 val result = mcpService.restartServer(newHost, newPort)
                 when (result) {
-                    is KtorMcpServer.StartResult.Success -> {
+                    is KtorServer.StartResult.Success -> {
                         NotificationGroupManager.getInstance()
                             .getNotificationGroup(McpConstants.NOTIFICATION_GROUP_ID)
                             .createNotification(
@@ -243,7 +243,7 @@ class McpSettingsConfigurable : Configurable {
                             )
                             .notify(null)
                     }
-                    is KtorMcpServer.StartResult.PortInUse -> {
+                    is KtorServer.StartResult.PortInUse -> {
                         NotificationGroupManager.getInstance()
                             .getNotificationGroup(McpConstants.NOTIFICATION_GROUP_ID)
                             .createNotification(
@@ -253,7 +253,7 @@ class McpSettingsConfigurable : Configurable {
                             )
                             .notify(null)
                     }
-                    is KtorMcpServer.StartResult.Error -> {
+                    is KtorServer.StartResult.Error -> {
                         NotificationGroupManager.getInstance()
                             .getNotificationGroup(McpConstants.NOTIFICATION_GROUP_ID)
                             .createNotification(
