@@ -1,8 +1,8 @@
-# IDE Index MCP Server
+# JetBrains CLI Plugin
 
-![Build](https://github.com/hechtcarmel/jetbrains-index-mcp-plugin/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/29174.svg)](https://plugins.jetbrains.com/plugin/29174-ide-index-mcp-server)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/29174.svg)](https://plugins.jetbrains.com/plugin/29174-ide-index-mcp-server)
+![Build](https://github.com/hechtcarmel/jetbrains-cli-plugin/workflows/Build/badge.svg)
+[![Version](https://img.shields.io/jetbrains/plugin/v/29174.svg)](https://plugins.jetbrains.com/plugin/29174-jetbrains-cli-plugin)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/29174.svg)](https://plugins.jetbrains.com/plugin/29174-jetbrains-cli-plugin)
 
 A JetBrains IDE plugin that exposes an **MCP (Model Context Protocol) server**, enabling AI coding assistants like Claude, Codex, Cursor, and Windsurf to leverage the IDE's powerful indexing and refactoring capabilities.
 
@@ -12,7 +12,7 @@ A JetBrains IDE plugin that exposes an **MCP (Model Context Protocol) server**, 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hechtcarmel)
 
 <!-- Plugin description -->
-**IDE Index MCP Server** provides AI coding assistants with access to the IDE's powerful code intelligence features through the Model Context Protocol (MCP).
+**IDE JetBrains CLI** provides AI coding assistants with access to the IDE's powerful code intelligence features through the Model Context Protocol (MCP).
 
 ### Features
 
@@ -81,7 +81,7 @@ Perfect for AI-assisted development workflows where accuracy and safety matter.
 
 ### Using the IDE built-in plugin system
 
-<kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "IDE Index MCP Server"</kbd> > <kbd>Install</kbd>
+<kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "IDE JetBrains CLI"</kbd> > <kbd>Install</kbd>
 
 ### Using JetBrains Marketplace
 
@@ -101,13 +101,13 @@ Download the [latest release](https://plugins.jetbrains.com/plugin/29174-ide-ind
    - WebStorm: `webstorm-index` on port **29173**
    - Other IDEs: See [IDE-Specific Defaults](#ide-specific-defaults)
 3. **Configure your AI assistant** using the "Install on Coding Agents" button (easiest) or manually
-4. **Use the tool window** (bottom panel: "Index MCP Server") to copy configuration or monitor commands
-5. **Change port** (optional): Click "Change port, disable tools" in the toolbar or go to <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>Index MCP Server</kbd>
+4. **Use the tool window** (bottom panel: "JetBrains CLI") to copy configuration or monitor commands
+5. **Change port** (optional): Click "Change port, disable tools" in the toolbar or go to <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>JetBrains CLI</kbd>
 
 ### Using the "Install on Coding Agents" Button
 
 The easiest way to configure your AI assistant:
-1. Open the "Index MCP Server" tool window (bottom panel)
+1. Open the "JetBrains CLI" tool window (bottom panel)
 2. Click the prominent **"Install on Coding Agents"** button on the right side of the toolbar
 3. A popup appears with two sections:
    - **Install Now** - For Claude Code CLI and Codex CLI: Runs the installation command automatically
@@ -217,7 +217,7 @@ Each JetBrains IDE has a unique default port and server name to allow running mu
 
 ## Available Tools
 
-The plugin provides **21 MCP tools** organized by availability. Tools marked *(disabled by default)* can be enabled in <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>Index MCP Server</kbd>.
+The plugin provides **21 MCP tools** organized by availability. Tools marked *(disabled by default)* can be enabled in <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>JetBrains CLI</kbd>.
 
 ### Universal Tools
 
@@ -321,7 +321,7 @@ When an error occurs, the response includes all available sub-projects so AI age
 
 ## Tool Window
 
-The plugin adds an "Index MCP Server" tool window (bottom panel) that shows:
+The plugin adds an "JetBrains CLI" tool window (bottom panel) that shows:
 
 - **Server Status**: Running indicator with server URL and port
 - **Project Name**: Currently active project
@@ -365,7 +365,7 @@ The plugin adds an "Index MCP Server" tool window (bottom panel) that shows:
 
 ## Settings
 
-Configure the plugin at <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>Index MCP Server</kbd>:
+Configure the plugin at <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>JetBrains CLI</kbd>:
 
 | Setting | Default | Description |
 |---------|---------|-------------|

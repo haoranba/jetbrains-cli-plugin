@@ -1,15 +1,3 @@
----
-name: jetbrains-cli
-description: >
-  CLI tool for JetBrains IDE code intelligence via MCP. TRIGGER when ANY of these MCP tools are available:
-  ide_find_references, ide_find_definition, ide_find_class, ide_find_file, ide_search_text, ide_diagnostics,
-  ide_refactor_rename, ide_move_file, ide_type_hierarchy, ide_call_hierarchy, ide_find_implementations.
-  Use when searching for references, definitions, implementations, type hierarchy, call hierarchy,
-  refactoring (rename, move), checking diagnostics, or building projects. PREFER over grep/ripgrep for
-  semantic code search. Keywords: find usages, find references, find definition, rename, refactor,
-  diagnostics, jetbrains, intellij, ide index.
----
-
 # jetbrains-cli 使用指南
 
 ## 触发条件
@@ -25,7 +13,7 @@ description: >
 ## 前提条件
 
 1. **JetBrains IDE 必须运行中** - IntelliJ IDEA、PyCharm、WebStorm、GoLand 等
-2. **Plugin 必须安装并运行** - "Index MCP Server" plugin
+2. **Plugin 必须安装并运行** - "JetBrains CLI" plugin
 3. **CLI 必须已安装** - `jetbrains-cli` 命令可用
 
 ## 常用命令速查

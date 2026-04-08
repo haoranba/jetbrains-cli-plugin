@@ -1,6 +1,6 @@
-# IDE Index MCP Server - Tool Reference
+# IDE JetBrains CLI - Tool Reference
 
-This document provides detailed documentation for all MCP tools available in the IDE Index MCP Server plugin.
+This document provides detailed documentation for all MCP tools available in the IDE JetBrains CLI plugin.
 
 ## Tool Availability by IDE
 
@@ -610,7 +610,7 @@ Force the IDE to synchronize its virtual file system and PSI cache with external
 
 ### ide_build_project
 
-> **Default**: Disabled - enable in Settings > Tools > Index MCP Server
+> **Default**: Disabled - enable in Settings > Tools > JetBrains CLI
 
 Build the project using the IDE's build system (supports JPS, Gradle, Maven).
 
@@ -665,7 +665,7 @@ Build the project using the IDE's build system (supports JPS, Gradle, Maven).
 
 ### ide_read_file
 
-> **Default**: Disabled - enable in Settings > Tools > Index MCP Server
+> **Default**: Disabled - enable in Settings > Tools > JetBrains CLI
 
 Read file content by file path or fully qualified class name.
 
@@ -719,7 +719,7 @@ Read file content by file path or fully qualified class name.
 
 ### ide_get_active_file
 
-> **Default**: Disabled - enable in Settings > Tools > Index MCP Server
+> **Default**: Disabled - enable in Settings > Tools > JetBrains CLI
 
 Get the currently active file(s) open in the IDE editor, including split panes.
 
@@ -766,7 +766,7 @@ Get the currently active file(s) open in the IDE editor, including split panes.
 
 ### ide_open_file
 
-> **Default**: Disabled - enable in Settings > Tools > Index MCP Server
+> **Default**: Disabled - enable in Settings > Tools > JetBrains CLI
 
 Open a file in the IDE editor with optional line/column navigation.
 
@@ -996,7 +996,7 @@ Move a file to a new directory using the IDE's refactoring engine. Automatically
 
 ### ide_reformat_code
 
-> **Default**: Disabled - enable in Settings > Tools > Index MCP Server
+> **Default**: Disabled - enable in Settings > Tools > JetBrains CLI
 
 Reformat code according to the project's code style settings. Equivalent to the IDE's "Reformat Code" action (<kbd>Ctrl+Alt+L</kbd> / <kbd>Cmd+Opt+L</kbd>).
 
@@ -1330,7 +1330,7 @@ Finds all concrete implementations of an interface, abstract class, or abstract 
 
 ### ide_find_symbol
 
-> **Default**: Disabled - enable in Settings > Tools > Index MCP Server
+> **Default**: Disabled - enable in Settings > Tools > JetBrains CLI
 
 Searches for code symbols (classes, interfaces, methods, fields) by name using the IDE's semantic index.
 
@@ -1545,7 +1545,7 @@ Finds the complete inheritance hierarchy for a method - all parent methods it ov
 
 ### ide_file_structure
 
-> **Default**: Disabled - enable in Settings > Tools > Index MCP Server
+> **Default**: Disabled - enable in Settings > Tools > JetBrains CLI
 
 Get the hierarchical structure of a source file, similar to the IDE's Structure view (<kbd>Cmd+7</kbd> / <kbd>Alt+7</kbd>).
 
@@ -1596,7 +1596,7 @@ These tools require the Java plugin and are only available in **IntelliJ IDEA** 
 
 ### ide_convert_java_to_kotlin
 
-> **Default**: Disabled - enable in Settings > Tools > Index MCP Server
+> **Default**: Disabled - enable in Settings > Tools > JetBrains CLI
 
 Convert one or more Java files to Kotlin using IntelliJ's built-in J2K (Java-to-Kotlin) converter.
 

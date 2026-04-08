@@ -124,7 +124,7 @@ Omit `paths` to sync the entire project.
 
 ## Disabled-by-Default Tools
 
-These tools exist but are disabled by default. If you get "tool not found", they need to be enabled in IDE settings (Settings > Tools > Index MCP Server):
+These tools exist but are disabled by default. If you get "tool not found", they need to be enabled in IDE settings (Settings > Tools > JetBrains CLI):
 
 `ide_build_project`, `ide_file_structure`, `ide_find_symbol`, `ide_read_file`, `ide_get_active_file`, `ide_open_file`, `ide_reformat_code`
 

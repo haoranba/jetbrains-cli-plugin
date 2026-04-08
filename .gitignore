@@ -1,25 +1,24 @@
-# Dependencies
-node_modules/
+# ===== Node.js / CLI =====
+cli/node_modules/
+cli/dist/
 
-# Build outputs
-build/
-.gradle/
-.intellijPlatform/
-.kotlin/
+# ===== Gradle / JVM =====
+jetbrains-cli-plugin/build/
+jetbrains-cli-plugin/.gradle/
+jetbrains-cli-plugin/.intellijPlatform/
+jetbrains-cli-plugin/.kotlin/
+jetbrains-cli-plugin/local.properties
 
-# IDE
+# ===== IDE =====
 .idea/
 *.iml
 
-# OS
+# ===== OS =====
 .DS_Store
 
-# Temp
-tmp/
+# ===== Misc =====
 .qodana/
+tmp/
 
-# Claude
+# ===== Local tooling =====
 .claude/
-
-# Other
-local.properties
