@@ -2,6 +2,7 @@ package com.github.hechtcarmel.jetbrainsindexmcpplugin.tools
 
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.handlers.LanguageHandlerRegistry
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.McpServerService
+import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.DebuggerSupport
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.models.ToolDefinition
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.settings.McpSettings
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.editor.GetActiveFileTool
@@ -196,6 +197,11 @@ class ToolRegistry {
             registerKotlinConversionTools()
         }
 
+        // Debugger tools - only available when debugger is supported
+        if (DebuggerSupport.isSupported()) {
+            registerDebuggerTools()
+        }
+
         LOG.info("Registered ${tools.size} built-in MCP tools")
         logAvailableLanguages()
     }
@@ -342,5 +348,57 @@ class ToolRegistry {
                 LOG.warn("Failed to register Kotlin conversion tool $className: ${e.message}")
             }
         }
+    }
+
+    /**
+     * Registers debugger tools.
+     *
+     * These tools use the XDebugger API and are available in most JetBrains IDEs
+     * (IntelliJ IDEA, PyCharm, GoLand, etc.).
+     */
+    private fun registerDebuggerTools() {
+        val debuggerToolClasses = listOf(
+            // Session management
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.session.ListRunConfigurationsTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.session.RunConfigurationTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.session.ListDebugSessionsTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.session.StartDebugSessionTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.session.StopDebugSessionTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.session.GetDebugSessionStatusTool",
+            // Breakpoint management
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.breakpoint.ListBreakpointsTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.breakpoint.SetBreakpointTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.breakpoint.RemoveBreakpointTool",
+            // Execution control
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.execution.ResumeTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.execution.PauseTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.execution.StepOverTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.execution.StepIntoTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.execution.StepOutTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.execution.RunToLineTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.execution.WaitForPauseTool",
+            // Stack and threads
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.stack.GetStackTraceTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.stack.ListThreadsTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.stack.SelectStackFrameTool",
+            // Variables and evaluation
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.evaluation.GetVariablesTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.evaluation.SetVariableTool",
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.evaluation.EvaluateTool",
+            // Navigation
+            "com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.navigation.GetSourceContextTool"
+        )
+
+        for (className in debuggerToolClasses) {
+            try {
+                val toolClass = Class.forName(className)
+                val tool = toolClass.getDeclaredConstructor().newInstance() as McpTool
+                register(tool)
+            } catch (e: Exception) {
+                LOG.warn("Failed to register debugger tool $className: ${e.message}")
+            }
+        }
+
+        LOG.info("Registered debugger tools")
     }
 }
