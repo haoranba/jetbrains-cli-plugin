@@ -28,7 +28,7 @@ class RunConfigurationTool : AbstractMcpTool() {
     override val inputSchema: JsonObject = SchemaBuilder.tool()
         .projectPath()
         .stringProperty(ParamNames.CONFIG_NAME, "运行配置名称", required = true)
-        .booleanProperty("debug", "是否以调试模式运行（默认 true）", required = false)
+        .booleanProperty(ParamNames.DEBUG, "是否以调试模式运行（默认 true）", required = false)
         .build()
 
     override suspend fun doExecute(project: Project, arguments: JsonObject): ToolCallResult {
@@ -39,7 +39,7 @@ class RunConfigurationTool : AbstractMcpTool() {
         val configName = arguments[ParamNames.CONFIG_NAME]?.jsonPrimitive?.content
             ?: return createErrorResult("缺少必需参数: ${ParamNames.CONFIG_NAME}")
 
-        val debug = arguments["debug"]?.jsonPrimitive?.content?.toBoolean() ?: true
+        val debug = arguments[ParamNames.DEBUG]?.jsonPrimitive?.content?.toBoolean() ?: true
 
         return readAction {
             val runManager = RunManager.getInstance(project)

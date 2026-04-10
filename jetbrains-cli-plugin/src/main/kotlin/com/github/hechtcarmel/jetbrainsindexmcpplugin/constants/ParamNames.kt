@@ -75,6 +75,7 @@ object ParamNames {
     // Debugger parameters
     const val SESSION_ID = "session_id"
     const val CONFIG_NAME = "configName"
+    const val DEBUG = "debug"
     const val CONDITION = "condition"
     const val LOG_MESSAGE = "logMessage"
     const val FRAME_INDEX = "frameIndex"
