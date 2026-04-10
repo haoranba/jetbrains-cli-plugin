@@ -36,4 +36,10 @@ object PluginDetectors {
         name = "Kotlin",
         pluginIds = listOf("org.jetbrains.kotlin")
     )
+
+    val debugger = PluginDetector(
+        name = "Debugger",
+        pluginIds = listOf("com.intellij.modules.xdebugger"),
+        fallbackClass = "com.intellij.xdebugger.XDebuggerManager"
+    )
 }

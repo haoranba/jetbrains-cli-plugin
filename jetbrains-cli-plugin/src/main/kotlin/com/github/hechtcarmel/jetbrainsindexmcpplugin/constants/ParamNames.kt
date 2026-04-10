@@ -71,4 +71,16 @@ object ParamNames {
     const val TEST_RESULT_FILTER = "testResultFilter"
     const val MAX_BUILD_ERRORS = "maxBuildErrors"
     const val MAX_TEST_RESULTS = "maxTestResults"
+
+    // Debugger parameters
+    const val SESSION_ID = "session_id"
+    const val CONFIG_NAME = "configName"
+    const val CONDITION = "condition"
+    const val LOG_MESSAGE = "logMessage"
+    const val FRAME_INDEX = "frameIndex"
+    const val EXPRESSION = "expression"
+    const val VALUE = "value"
+    const val TIMEOUT_MS = "timeoutMs"
+    const val BREAKPOINT_ID = "breakpointId"
+    const val CONTEXT_LINES = "contextLines"
 }
