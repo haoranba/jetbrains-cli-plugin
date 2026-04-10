@@ -1,6 +1,6 @@
 # JetBrains CLI Plugin
 
-![Build](https://github.com/hechtcarmel/jetbrains-cli-plugin/workflows/Build/badge.svg)
+![Build](https://github.com/haoranba/jetbrains-cli-plugin/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/29174.svg)](https://plugins.jetbrains.com/plugin/29174-jetbrains-cli-plugin)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/29174.svg)](https://plugins.jetbrains.com/plugin/29174-jetbrains-cli-plugin)
 
@@ -9,7 +9,7 @@ A JetBrains IDE plugin that exposes a **JSON-RPC API** for CLI tools, enabling A
 **Fully tested**: IntelliJ IDEA, PyCharm, WebStorm, GoLand, RustRover, Android Studio, PhpStorm
 **May work** (untested): RubyMine, CLion, DataGrip
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hechtcarmel)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/haoranba)
 
 <!-- Plugin description -->
 **JetBrains CLI Plugin** provides CLI tools and AI coding assistants with access to the IDE's powerful code intelligence features through a simple JSON-RPC API.
@@ -116,7 +116,7 @@ npm install -g jetbrains-cli
 ### Build from source
 
 ```bash
-git clone https://github.com/hechtcarmel/jetbrains-cli-plugin.git
+git clone https://github.com/haoranba/jetbrains-cli-plugin.git
 cd jetbrains-cli-plugin/cli
 npm install
 npm run build

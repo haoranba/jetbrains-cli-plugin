@@ -1,5 +1,7 @@
 # Changelog
 
+## [Unreleased]
+
 ## [4.11.0]
 
 ### Added
@@ -34,3 +36,7 @@
 - MCP Streamable HTTP transport (`StreamableHttpSessionManager`)
 - `initialize` and `notifications/initialized` JSON-RPC methods
 - MCP-specific constants and configuration generation
+
+[Unreleased]: https://github.com/haoranba/jetbrains-cli-plugin/compare/v4.11.0...HEAD
+[4.11.0]: https://github.com/haoranba/jetbrains-cli-plugin/compare/v4.10.1...v4.11.0
+[4.10.1]: https://github.com/haoranba/jetbrains-cli-plugin/commits/v4.10.1
