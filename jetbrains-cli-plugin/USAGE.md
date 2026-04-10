@@ -1,6 +1,6 @@
 # IDE JetBrains CLI - Tool Reference
 
-This document provides detailed documentation for all MCP tools available in the IDE JetBrains CLI plugin.
+This document provides detailed documentation for all tools available in the IDE JetBrains CLI plugin.
 
 ## Tool Availability by IDE
 
@@ -1774,7 +1774,7 @@ Safely deletes an element, first checking for usages.
 | -32602 | Invalid Params | Missing or invalid parameters |
 | -32603 | Internal Error | Unexpected server error |
 
-### Custom MCP Errors
+### Custom Errors
 
 | Code | Name | When It Occurs |
 |------|------|----------------|
