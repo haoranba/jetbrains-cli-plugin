@@ -39,6 +39,7 @@ program
     .version("1.0.0")
     .option("--host <host>", "Server host", "127.0.0.1")
     .option("--port <port>", "Server port", "29170")
+    .option("--project-path <path>", "Project path (required when multiple projects are open)")
     .option("--json", "Output raw JSON", false);
 // Register commands
 (0, list_tools_js_1.listToolsCommand)(program);

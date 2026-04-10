@@ -92,6 +92,30 @@ All tools accept an optional `project_path` parameter:
 |-----------|------|----------|-------------|
 | `project_path` | string | No | Absolute path to the project root. Required when multiple projects are open in the IDE. For workspace projects, use the sub-project path. |
 
+### Search Scope Parameter
+
+Many search tools accept an `includeLibraries` parameter:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `includeLibraries` | boolean | `false` | Include results from library dependencies. When `false`, only searches project source code. When `true`, also searches classes/files/symbols from JAR dependencies. |
+
+**Tools that support `includeLibraries`:**
+- `ide_find_class` - Search classes from dependencies
+- `ide_find_file` - Search files from dependencies
+- `ide_find_symbol` - Search symbols from dependencies
+
+**Example:**
+```json
+{
+  "name": "ide_find_class",
+  "arguments": {
+    "query": "EnableMongo",
+    "includeLibraries": true
+  }
+}
+```
+
 ### Position Parameters
 
 Most tools operate on a specific location in code and require these parameters:

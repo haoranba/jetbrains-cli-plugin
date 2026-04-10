@@ -4,7 +4,7 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/29174.svg)](https://plugins.jetbrains.com/plugin/29174-jetbrains-cli-plugin)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/29174.svg)](https://plugins.jetbrains.com/plugin/29174-jetbrains-cli-plugin)
 
-A JetBrains IDE plugin that exposes an **MCP (Model Context Protocol) server**, enabling AI coding assistants like Claude, Codex, Cursor, and Windsurf to leverage the IDE's powerful indexing and refactoring capabilities.
+A JetBrains IDE plugin that exposes a **JSON-RPC API** for CLI tools, enabling AI coding assistants and command-line tools to leverage the IDE's powerful indexing and refactoring capabilities.
 
 **Fully tested**: IntelliJ IDEA, PyCharm, WebStorm, GoLand, RustRover, Android Studio, PhpStorm
 **May work** (untested): RubyMine, CLion, DataGrip
@@ -12,7 +12,7 @@ A JetBrains IDE plugin that exposes an **MCP (Model Context Protocol) server**, 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hechtcarmel)
 
 <!-- Plugin description -->
-**IDE JetBrains CLI** provides AI coding assistants with access to the IDE's powerful code intelligence features through the Model Context Protocol (MCP).
+**JetBrains CLI Plugin** provides CLI tools and AI coding assistants with access to the IDE's powerful code intelligence features through a simple JSON-RPC API.
 
 ### Features
 
@@ -69,10 +69,11 @@ Perfect for AI-assisted development workflows where accuracy and safety matter.
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Client Configuration](#client-configuration)
+- [CLI Installation](#cli-installation)
 - [Available Tools](#available-tools)
 - [Multi-Project Support](#multi-project-support)
 - [Tool Window](#tool-window)
+- [API Reference](#api-reference)
 - [Error Codes](#error-codes)
 - [Requirements](#requirements)
 - [Contributing](#contributing)
@@ -81,143 +82,80 @@ Perfect for AI-assisted development workflows where accuracy and safety matter.
 
 ### Using the IDE built-in plugin system
 
-<kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "IDE JetBrains CLI"</kbd> > <kbd>Install</kbd>
+<kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "JetBrains CLI"</kbd> > <kbd>Install</kbd>
 
 ### Using JetBrains Marketplace
 
-Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/29174-ide-index-mcp-server) and install it by clicking the <kbd>Install to ...</kbd> button.
+Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/29174-jetbrains-cli-plugin) and install it by clicking the <kbd>Install to ...</kbd> button.
 
 ### Manual Installation
 
-Download the [latest release](https://plugins.jetbrains.com/plugin/29174-ide-index-mcp-server/versions) and install it manually:
+Download the [latest release](https://plugins.jetbrains.com/plugin/29174-jetbrains-cli-plugin/versions) and install it manually:
 <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
 ## Quick Start
 
 1. **Install the plugin** and restart your JetBrains IDE
-2. **Open a project** - the MCP server starts automatically with IDE-specific defaults:
-   - IntelliJ IDEA: `intellij-index` on port **29170**
-   - PyCharm: `pycharm-index` on port **29172**
-   - WebStorm: `webstorm-index` on port **29173**
+2. **Open a project** - the server starts automatically with IDE-specific defaults:
+   - IntelliJ IDEA: port **29170**
+   - PyCharm: port **29172**
+   - WebStorm: port **29173**
    - Other IDEs: See [IDE-Specific Defaults](#ide-specific-defaults)
-3. **Configure your AI assistant** using the "Install on Coding Agents" button (easiest) or manually
-4. **Use the tool window** (bottom panel: "JetBrains CLI") to copy configuration or monitor commands
+3. **Install the CLI** (see below)
+4. **Use the tool window** (bottom panel: "JetBrains CLI") to monitor commands and server status
 5. **Change port** (optional): Click "Change port, disable tools" in the toolbar or go to <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>JetBrains CLI</kbd>
 
-### Using the "Install on Coding Agents" Button
+## CLI Installation
 
-The easiest way to configure your AI assistant:
-1. Open the "JetBrains CLI" tool window (bottom panel)
-2. Click the prominent **"Install on Coding Agents"** button on the right side of the toolbar
-3. A popup appears with two sections:
-   - **Install Now** - For Claude Code CLI and Codex CLI: Runs the installation command automatically
-   - **Copy Configuration** - For other clients: Copies the JSON config to your clipboard
-4. For "Copy Configuration" clients, paste the config into the appropriate config file
-
-## Client Configuration
-
-### Claude Code (CLI)
-
-Use the "Install on Coding Agents" button in the tool window, or run this command (adjust name and port for your IDE):
+### Install from npm (recommended)
 
 ```bash
-# IntelliJ IDEA
-claude mcp add --transport http intellij-index http://127.0.0.1:29170/index-mcp/streamable-http --scope user
-
-# PyCharm
-claude mcp add --transport http pycharm-index http://127.0.0.1:29172/index-mcp/streamable-http --scope user
-
-# WebStorm
-claude mcp add --transport http webstorm-index http://127.0.0.1:29173/index-mcp/streamable-http --scope user
+npm install -g jetbrains-cli
 ```
 
-Options:
-- `--scope user` - Adds globally for all projects
-- `--scope project` - Adds to current project only
-
-To remove: `claude mcp remove <server-name>` (e.g., `claude mcp remove intellij-index`)
-
-### Codex CLI
-
-Use the "Install on Coding Agents" button in the tool window, or run this command (adjust name and port for your IDE):
+### Build from source
 
 ```bash
-# IntelliJ IDEA
-codex mcp add intellij-index --url http://127.0.0.1:29170/index-mcp/streamable-http
-
-# PyCharm
-codex mcp add pycharm-index --url http://127.0.0.1:29172/index-mcp/streamable-http
-
-# WebStorm
-codex mcp add webstorm-index --url http://127.0.0.1:29173/index-mcp/streamable-http
+git clone https://github.com/hechtcarmel/jetbrains-cli-plugin.git
+cd jetbrains-cli-plugin/cli
+npm install
+npm run build
+npm link  # optional, makes 'jetbrains-cli' available globally
 ```
 
-To remove: `codex mcp remove <server-name>` (e.g., `codex mcp remove intellij-index`)
+### CLI Usage
 
-### Cursor
+```bash
+# List all available tools
+jetbrains-cli list-tools
 
-Add to `.cursor/mcp.json` in your project root or `~/.cursor/mcp.json` globally (adjust name and port for your IDE):
+# Find class (project sources only)
+jetbrains-cli find-class --query UserService
 
-```json
-{
-  "mcpServers": {
-    "intellij-index": {
-      "url": "http://127.0.0.1:29170/index-mcp/streamable-http"
-    }
-  }
-}
+# Find class (include library dependencies)
+jetbrains-cli find-class --query EnableMongo --include-libraries
+
+# Find usages
+jetbrains-cli find-usages --file src/Main.java --line 10 --column 5
+
+# Get diagnostics
+jetbrains-cli diagnostics --file src/Main.java
+
+# Check index status
+jetbrains-cli index-status
 ```
 
-### Windsurf
+### Multi-Project Support
 
-Add to `~/.codeium/windsurf/mcp_config.json` (adjust name and port for your IDE):
+When multiple projects are open, specify `--project-path`:
 
-```json
-{
-  "mcpServers": {
-    "intellij-index": {
-      "serverUrl": "http://127.0.0.1:29170/index-mcp/streamable-http"
-    }
-  }
-}
+```bash
+jetbrains-cli --project-path /Users/dev/myproject find-class --query UserService
 ```
-
-### VS Code (Generic MCP)
-
-```json
-{
-  "mcp.servers": {
-    "intellij-index": {
-      "url": "http://127.0.0.1:29170/index-mcp/streamable-http"
-    }
-  }
-}
-```
-
-> **Note**: Replace the server name and port with your IDE's defaults. See [IDE-Specific Defaults](#ide-specific-defaults) below.
-
-### IDE-Specific Defaults
-
-Each JetBrains IDE has a unique default port and server name to allow running multiple IDEs simultaneously without conflicts:
-
-| IDE | Server Name | Default Port |
-|-----|-------------|--------------|
-| IntelliJ IDEA | `intellij-index` | 29170 |
-| Android Studio | `android-studio-index` | 29171 |
-| PyCharm | `pycharm-index` | 29172 |
-| WebStorm | `webstorm-index` | 29173 |
-| GoLand | `goland-index` | 29174 |
-| PhpStorm | `phpstorm-index` | 29175 |
-| RubyMine | `rubymine-index` | 29176 |
-| CLion | `clion-index` | 29177 |
-| RustRover | `rustrover-index` | 29178 |
-| DataGrip | `datagrip-index` | 29179 |
-
-> **Tip**: Use the "Install on Coding Agents" button in the tool window - it automatically uses the correct server name and port for your IDE.
 
 ## Available Tools
 
-The plugin provides **21 MCP tools** organized by availability. Tools marked *(disabled by default)* can be enabled in <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>JetBrains CLI</kbd>.
+The plugin provides **21 tools** organized by availability. Tools marked *(disabled by default)* can be enabled in <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>JetBrains CLI</kbd>.
 
 ### Universal Tools
 
@@ -277,32 +215,15 @@ These tools activate based on available language plugins:
 | RustRover | ✓ 14 tools | ✓ 4 tools | ✓ rename + reformat |
 | PhpStorm | ✓ 14 tools | ✓ 5 tools | ✓ rename + reformat |
 
-**May Work (Untested):**
-
-| IDE | Universal | Navigation | Refactoring |
-|-----|-----------|------------|-------------|
-| RubyMine | ✓ 14 tools | - | ✓ rename + reformat |
-| CLion | ✓ 14 tools | - | ✓ rename + reformat |
-| DataGrip | ✓ 14 tools | - | ✓ rename + reformat |
-
-> **Note**: Navigation tools activate when language plugins are present. GoLand and RustRover have 4 navigation tools (no `ide_find_implementations` or `ide_find_super_methods` due to language semantics). PhpStorm has 5 (no `ide_file_structure`). The rename and reformat tools work across all languages. `ide_convert_java_to_kotlin` is available only in IntelliJ IDEA and Android Studio, requires both Java and Kotlin plugins, and is disabled by default.
-
 For detailed tool documentation with parameters and examples, see [USAGE.md](USAGE.md).
 
 ## Multi-Project Support
 
 When multiple projects are open in a single IDE window, you must specify which project to use with the `project_path` parameter:
 
-```json
-{
-  "name": "ide_find_references",
-  "arguments": {
-    "project_path": "/Users/dev/myproject",
-    "file": "src/Main.kt",
-    "line": 10,
-    "column": 5
-  }
-}
+```bash
+# CLI example
+jetbrains-cli --project-path /Users/dev/myproject find-class --query UserService
 ```
 
 If `project_path` is omitted:
@@ -311,21 +232,15 @@ If `project_path` is omitted:
 
 ### Workspace Projects
 
-The plugin supports **workspace projects** where a single IDE window contains multiple sub-projects as modules with separate content roots. The `project_path` parameter accepts:
-
-- The **workspace root** path
-- A **sub-project path** (module content root)
-- A **subdirectory** of any open project
-
-When an error occurs, the response includes all available sub-projects so AI agents can discover the correct paths to use.
+The plugin supports **workspace projects** where a single IDE window contains multiple sub-projects as modules with separate content roots.
 
 ## Tool Window
 
-The plugin adds an "JetBrains CLI" tool window (bottom panel) that shows:
+The plugin adds a "JetBrains CLI" tool window (bottom panel) that shows:
 
 - **Server Status**: Running indicator with server URL and port
 - **Project Name**: Currently active project
-- **Command History**: Log of all MCP tool calls with:
+- **Command History**: Log of all tool calls with:
   - Timestamp
   - Tool name
   - Status (Success/Error/Pending)
@@ -337,10 +252,59 @@ The plugin adds an "JetBrains CLI" tool window (bottom panel) that shows:
 | Action | Description |
 |--------|-------------|
 | Refresh | Refresh server status and command history |
-| Copy URL | Copy the MCP server URL to clipboard |
+| Copy URL | Copy the server URL to clipboard |
 | Clear History | Clear the command history |
 | Export History | Export history to JSON or CSV file |
-| **Install on Coding Agents** | Install MCP server on AI assistants (prominent button on right) |
+
+## API Reference
+
+The plugin exposes a simple JSON-RPC 2.0 API:
+
+### Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api` | POST | JSON-RPC 2.0 request handling |
+| `/api/tools` | GET | List all available tools |
+| `/api/health` | GET | Health check |
+
+### JSON-RPC Methods
+
+| Method | Description |
+|--------|-------------|
+| `tools/list` | List all available tools |
+| `tools/call` | Execute a tool |
+| `ping` | Health check |
+
+### Example Request
+
+```bash
+# List tools
+curl http://127.0.0.1:29170/api/tools
+
+# Call a tool
+curl -X POST http://127.0.0.1:29170/api \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {
+      "name": "ide_find_class",
+      "arguments": {
+        "query": "UserService",
+        "includeLibraries": true
+      }
+    }
+  }'
+```
+
+### Health Check
+
+```bash
+curl http://127.0.0.1:29170/api/health
+# Response: {"status":"ok","version":"4.0.0","port":29170}
+```
 
 ## Error Codes
 
@@ -354,7 +318,7 @@ The plugin adds an "JetBrains CLI" tool window (bottom panel) that shows:
 | -32602 | Invalid Params | Invalid or missing parameters |
 | -32603 | Internal Error | Unexpected internal error |
 
-### Custom MCP Errors
+### Custom Errors
 
 | Code | Name | Description |
 |------|------|-------------|
@@ -369,17 +333,33 @@ Configure the plugin at <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>JetBrains 
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| Server Port | IDE-specific | MCP server port (range: 1024-65535, auto-restart on change). See [IDE-Specific Defaults](#ide-specific-defaults) |
+| Server Port | IDE-specific | Server port (range: 1024-65535, auto-restart on change). See [IDE-Specific Defaults](#ide-specific-defaults) |
 | Server Host | `127.0.0.1` | Listening host. Change to `0.0.0.0` for remote/WSL access |
 | Max History Size | 100 | Maximum number of commands to keep in history |
 | Sync External Changes | false | Sync external file changes before operations (**WARNING: significant performance impact**) |
 | Disabled Tools | 7 tools | Per-tool enable/disable toggles. Some tools are disabled by default to keep the tool list focused |
 
+### IDE-Specific Defaults
+
+Each JetBrains IDE has a unique default port:
+
+| IDE | Default Port |
+|-----|--------------|
+| IntelliJ IDEA | 29170 |
+| Android Studio | 29171 |
+| PyCharm | 29172 |
+| WebStorm | 29173 |
+| GoLand | 29174 |
+| PhpStorm | 29175 |
+| RubyMine | 29176 |
+| CLion | 29177 |
+| RustRover | 29178 |
+| DataGrip | 29179 |
+
 ## Requirements
 
 - **JetBrains IDE** 2025.1 or later (any IDE based on IntelliJ Platform)
 - **JVM** 21 or later
-- **MCP Protocol** 2025-03-26 (primary Streamable HTTP), with 2024-11-05 legacy SSE compatibility
 
 ### Supported IDEs
 
@@ -396,40 +376,6 @@ Configure the plugin at <kbd>Settings</kbd> > <kbd>Tools</kbd> > <kbd>JetBrains 
 - RubyMine
 - CLion
 - DataGrip
-
-> The plugin uses standard IntelliJ Platform APIs and should work on any IntelliJ-based IDE, but has only been tested on the IDEs listed above.
-
-## Architecture
-
-The plugin runs a **custom embedded Ktor CIO HTTP server** with **dual MCP transports**:
-
-### Streamable HTTP Transport (Primary, MCP 2025-03-26)
-
-```
-AI Assistant ──────► POST /index-mcp/streamable-http (initialize)
-                     ◄── HTTP 200 + Mcp-Session-Id
-             ──────► POST /index-mcp/streamable-http (requests/notifications)
-                     ◄── JSON-RPC response or HTTP 202 Accepted
-             ──────► DELETE /index-mcp/streamable-http
-                     ◄── HTTP 200                    (session terminated)
-```
-
-### Legacy SSE Transport (MCP Inspector, older clients)
-
-```
-AI Assistant ──────► GET /index-mcp/sse              (establish SSE stream)
-                     ◄── event: endpoint             (receive POST URL with sessionId)
-             ──────► POST /index-mcp?sessionId=x     (JSON-RPC requests)
-                     ◄── HTTP 202 Accepted
-                     ◄── event: message              (JSON-RPC response via SSE)
-```
-
-This dual approach:
-- **Primary MCP transport** - Streamable HTTP per MCP `2025-03-26`
-- **MCP Inspector compatible** - Legacy SSE transport per MCP `2024-11-05`
-- **Configurable port** - IDE-specific default port, changeable in settings
-- Works with any MCP-compatible client
-- Single server instance across all open projects
 
 ## Contributing
 

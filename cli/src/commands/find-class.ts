@@ -10,6 +10,7 @@ export function findClassCommand(program: Command) {
     .requiredOption("--query <query>", "Class name to search for")
     .option("--match-mode <mode>", "Match mode: substring, prefix, exact", "substring")
     .option("--max-results <n>", "Maximum results to return", "100")
+    .option("--include-libraries", "Include library classes in search", false)
     .action(async (options, cmd) => {
       const opts = cmd.parent.opts();
       const client = new JetbrainsClient({
@@ -21,7 +22,13 @@ export function findClassCommand(program: Command) {
         query: options.query,
         matchMode: options.matchMode,
         maxResults: parseInt(options.maxResults),
+        includeLibraries: options.includeLibraries,
       };
+
+      // Add project_path if specified
+      if (opts.projectPath) {
+        args.project_path = opts.projectPath;
+      }
 
       const response = await client.callTool("ide_find_class", args);
 
