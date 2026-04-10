@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.haoranba.jetbrainscliplugin</id>
-    <name>IDE MCP</name>
+    <name>IDE CLI</name>
     <vendor email="numbcode@gmail.com" url="https://github.com/haoranba">haoranba</vendor>
     <description><![CDATA[
 <p><b>Supercharge your AI coding assistant</b> with the IDE's powerful code intelligence through the
