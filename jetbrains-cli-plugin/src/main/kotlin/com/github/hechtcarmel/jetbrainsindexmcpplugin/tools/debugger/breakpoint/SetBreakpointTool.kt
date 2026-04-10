@@ -76,10 +76,10 @@ class SetBreakpointTool : AbstractMcpTool() {
                     file = file,
                     line = line,
                     enabled = true,
-                    condition = condition,
-                    logMessage = logMessage
+                    condition = null,  // Not applied - language-specific handling required
+                    logMessage = null  // Not applied - language-specific handling required
                 ),
-                message = "断点已设置"
+                message = "断点已设置（注意：条件和日志消息暂不支持）"
             ))
         }
     }
