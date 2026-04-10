@@ -7,7 +7,7 @@ import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.AbstractMcpTool
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.models.ExecutionResult
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.schema.SchemaBuilder
 import com.intellij.openapi.project.Project
-import com.intellij.xdebugger.XSourcePosition
+import com.intellij.xdebugger.XDebuggerUtil
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
@@ -52,7 +52,7 @@ class RunToLineTool : AbstractMcpTool() {
                 val virtualFile = resolveFile(project, file)
                     ?: return@edtAction createErrorResult("文件未找到: $file")
 
-                val position = XSourcePosition.create(virtualFile, line - 1)
+                val position = XDebuggerUtil.getInstance().createPosition(virtualFile, line - 1)
                     ?: return@edtAction createErrorResult("无法创建源码位置: $file:$line")
 
                 session.runToPosition(position, false)
