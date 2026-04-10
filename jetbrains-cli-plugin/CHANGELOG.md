@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [4.11.1]
+
+### Changed
+
+- Renamed plugin from "JetBrains CLI Plugin" to "JetBrains CLI" (JetBrains Marketplace requirement)
+
 ## [4.11.0]
 
 ### Added
