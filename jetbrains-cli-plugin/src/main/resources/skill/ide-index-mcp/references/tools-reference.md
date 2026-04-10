@@ -356,3 +356,250 @@ Open a file in the editor with optional navigation.
 | `project_path` | string | no | Project root path |
 
 **Returns**: `{ file, opened, message }`
+
+---
+
+## Debugger Tools
+
+### ide_list_run_configurations
+List all run/debug configurations.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ configurations: [{name, type, enabled}], totalCount }`
+
+### ide_start_debug_session
+Start a debug session for a configuration.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `configurationName` | string | yes | Name of the run configuration |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, sessionId, configurationName, message }`
+
+### ide_stop_debug_session
+Stop an active debug session.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_get_debug_session_status
+Get current debug session status.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ isActive, isPaused, isRunning, currentFile?, currentLine?, currentMethod?, sessionId }`
+
+### ide_list_debug_sessions
+List all active debug sessions.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ sessions: [{sessionId, configurationName, isActive, isPaused}], totalCount }`
+
+### ide_execute_run_configuration
+Execute a run configuration (run without debugging).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `configurationName` | string | yes | Name of the run configuration |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_list_breakpoints
+List all breakpoints.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ breakpoints: [{id, file, line, enabled, condition?}], totalCount }`
+
+### ide_set_breakpoint
+Set a breakpoint.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | yes | Relative file path |
+| `line` | integer | yes | 1-based line number |
+| `condition` | string | no | Optional condition expression |
+| `enabled` | boolean | no | Enable breakpoint (default true) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, breakpointId, file, line, message }`
+
+### ide_remove_breakpoint
+Remove a breakpoint.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `breakpointId` | string | no | Breakpoint ID |
+| `file` | string | no | File path (alternative to breakpointId) |
+| `line` | integer | no | Line number (required with file) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_resume_execution
+Resume execution.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_pause_execution
+Pause execution.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_step_over
+Step over current line.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_step_into
+Step into function.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_step_out
+Step out of current function.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_run_to_line
+Run to a specific line.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | yes | Relative file path |
+| `line` | integer | yes | 1-based line number |
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, message }`
+
+### ide_wait_for_pause
+Wait for debugger to pause.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `timeoutSeconds` | integer | no | Timeout in seconds (default 30, max 300) |
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, isPaused, pauseReason?, currentFile?, currentLine?, message }`
+**pauseReason values**: `BREAKPOINT`, `STEP`, `PAUSE`, `EXCEPTION`
+
+### ide_get_stack_trace
+Get call stack.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ frames: [{index, file, line, method, class, isCurrent}], frameCount }`
+
+### ide_list_threads
+List all threads.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ threads: [{id, name, status, isCurrent}], currentThreadId, totalCount }`
+**status values**: `RUNNING`, `WAITING`, `TIMED_WAITING`, `BLOCKED`, `NEW`, `TERMINATED`
+
+### ide_select_stack_frame
+Select a stack frame.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `frameIndex` | integer | yes | 0-based frame index |
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, selectedFrame, method, file, line, message }`
+
+### ide_get_variables
+Get variables in current scope.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `scope` | enum | no | `all` (default), `local`, `global` |
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ variables: [{name, type, value, isPrimitive}], scope, frameIndex }`
+
+### ide_set_variable
+Set a variable value.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | yes | Variable name |
+| `value` | string | yes | New value (string representation) |
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, name, oldValue?, newValue, message }`
+
+### ide_evaluate_expression
+Evaluate an expression.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `expression` | string | yes | Expression to evaluate |
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ success, result?, type?, isPrimitive, message }`
+
+### ide_get_source_context
+Get source code context at current position.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `contextLines` | integer | no | Lines before/after (default 5, max 50) |
+| `sessionId` | string | no | Session ID (uses active session if omitted) |
+| `project_path` | string | no | Project root path |
+
+**Returns**: `{ file, currentLine, source, contextLines }`

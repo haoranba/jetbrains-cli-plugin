@@ -80,6 +80,30 @@ These tools activate based on available language plugins:
 - [Java-Specific Refactoring Tools](#java-specific-refactoring-tools)
   - [ide_convert_java_to_kotlin](#ide_convert_java_to_kotlin)
   - [ide_refactor_safe_delete](#ide_refactor_safe_delete)
+- [Debugger Tools](#debugger-tools)
+  - [ide_list_run_configurations](#ide_list_run_configurations)
+  - [ide_start_debug_session](#ide_start_debug_session)
+  - [ide_stop_debug_session](#ide_stop_debug_session)
+  - [ide_get_debug_session_status](#ide_get_debug_session_status)
+  - [ide_list_debug_sessions](#ide_list_debug_sessions)
+  - [ide_execute_run_configuration](#ide_execute_run_configuration)
+  - [ide_list_breakpoints](#ide_list_breakpoints)
+  - [ide_set_breakpoint](#ide_set_breakpoint)
+  - [ide_remove_breakpoint](#ide_remove_breakpoint)
+  - [ide_resume_execution](#ide_resume_execution)
+  - [ide_pause_execution](#ide_pause_execution)
+  - [ide_step_over](#ide_step_over)
+  - [ide_step_into](#ide_step_into)
+  - [ide_step_out](#ide_step_out)
+  - [ide_run_to_line](#ide_run_to_line)
+  - [ide_wait_for_pause](#ide_wait_for_pause)
+  - [ide_get_stack_trace](#ide_get_stack_trace)
+  - [ide_list_threads](#ide_list_threads)
+  - [ide_select_stack_frame](#ide_select_stack_frame)
+  - [ide_get_variables](#ide_get_variables)
+  - [ide_set_variable](#ide_set_variable)
+  - [ide_evaluate_expression](#ide_evaluate_expression)
+  - [ide_get_source_context](#ide_get_source_context)
 - [Error Handling](#error-handling)
 
 ---
@@ -1757,6 +1781,1020 @@ Safely deletes an element, first checking for usages.
       "context": "LegacyHelper.convert(data)"
     }
   ]
+}
+```
+
+---
+
+## Debugger Tools
+
+Comprehensive debugging support for AI-assisted debugging workflows. These tools provide full control over the IDE's debugger, including session management, breakpoints, execution control, and variable inspection.
+
+### ide_list_run_configurations
+
+List all available run/debug configurations in the project.
+
+**Use when:**
+- Discovering what configurations can be debugged
+- Finding configuration names to start debug sessions
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| (none) | | | Only `project_path` if multiple projects are open |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_list_run_configurations",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "configurations": [
+    {
+      "name": "Application",
+      "type": "Application",
+      "enabled": true
+    },
+    {
+      "name": "All Tests",
+      "type": "JUnit",
+      "enabled": true
+    }
+  ],
+  "totalCount": 2
+}
+```
+
+---
+
+### ide_start_debug_session
+
+Start a debug session for a run configuration.
+
+**Use when:**
+- Starting a debugging session
+- Launching an application in debug mode
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `configurationName` | string | Yes | Name of the run configuration to debug |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_start_debug_session",
+    "arguments": {
+      "configurationName": "Application"
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "sessionId": "debug-session-1",
+  "configurationName": "Application",
+  "message": "Debug session started for 'Application'"
+}
+```
+
+---
+
+### ide_stop_debug_session
+
+Stop an active debug session.
+
+**Use when:**
+- Ending a debugging session
+- Cleaning up after debugging
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID to stop. If omitted, stops the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_stop_debug_session",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Debug session stopped"
+}
+```
+
+---
+
+### ide_get_debug_session_status
+
+Get the current status of a debug session.
+
+**Use when:**
+- Checking if debugger is paused or running
+- Getting current execution state
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID to check. If omitted, checks the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_get_debug_session_status",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "isActive": true,
+  "isPaused": true,
+  "isRunning": false,
+  "currentFile": "src/main/java/com/example/App.java",
+  "currentLine": 42,
+  "currentMethod": "main",
+  "sessionId": "debug-session-1"
+}
+```
+
+---
+
+### ide_list_debug_sessions
+
+List all active debug sessions.
+
+**Use when:**
+- Managing multiple debug sessions
+- Finding session IDs
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| (none) | | | Only `project_path` if multiple projects are open |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_list_debug_sessions",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "sessions": [
+    {
+      "sessionId": "debug-session-1",
+      "configurationName": "Application",
+      "isActive": true,
+      "isPaused": true
+    }
+  ],
+  "totalCount": 1
+}
+```
+
+---
+
+### ide_execute_run_configuration
+
+Execute a run configuration (run without debugging).
+
+**Use when:**
+- Running an application normally
+- Executing tests without debugging
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `configurationName` | string | Yes | Name of the run configuration to execute |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_execute_run_configuration",
+    "arguments": {
+      "configurationName": "All Tests"
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Started execution of 'All Tests'"
+}
+```
+
+---
+
+### ide_list_breakpoints
+
+List all breakpoints in the project.
+
+**Use when:**
+- Viewing all set breakpoints
+- Finding breakpoint IDs for removal
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| (none) | | | Only `project_path` if multiple projects are open |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_list_breakpoints",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "breakpoints": [
+    {
+      "id": "bp-1",
+      "file": "src/main/java/com/example/App.java",
+      "line": 25,
+      "enabled": true,
+      "condition": null
+    },
+    {
+      "id": "bp-2",
+      "file": "src/main/java/com/example/Service.java",
+      "line": 42,
+      "enabled": true,
+      "condition": "id != null"
+    }
+  ],
+  "totalCount": 2
+}
+```
+
+---
+
+### ide_set_breakpoint
+
+Set a breakpoint at a specific location.
+
+**Use when:**
+- Setting breakpoints for debugging
+- Adding conditional breakpoints
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | Yes | File path relative to project root |
+| `line` | integer | Yes | 1-based line number |
+| `condition` | string | No | Optional condition expression |
+| `enabled` | boolean | No | Whether breakpoint is enabled (default: true) |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_set_breakpoint",
+    "arguments": {
+      "file": "src/main/java/com/example/App.java",
+      "line": 42,
+      "condition": "userId != null"
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "breakpointId": "bp-3",
+  "file": "src/main/java/com/example/App.java",
+  "line": 42,
+  "message": "Breakpoint set at line 42"
+}
+```
+
+---
+
+### ide_remove_breakpoint
+
+Remove a breakpoint.
+
+**Use when:**
+- Removing breakpoints after debugging
+- Cleaning up breakpoints
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `breakpointId` | string | No | ID of breakpoint to remove |
+| `file` | string | No | File path (alternative to breakpointId) |
+| `line` | integer | No | Line number (required with file) |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_remove_breakpoint",
+    "arguments": {
+      "breakpointId": "bp-3"
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Breakpoint removed"
+}
+```
+
+---
+
+### ide_resume_execution
+
+Resume execution of a paused debug session.
+
+**Use when:**
+- Continuing after hitting a breakpoint
+- Resuming from pause
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_resume_execution",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Execution resumed"
+}
+```
+
+---
+
+### ide_pause_execution
+
+Pause execution of a running debug session.
+
+**Use when:**
+- Pausing a running application
+- Interrupting execution
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_pause_execution",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Execution paused"
+}
+```
+
+---
+
+### ide_step_over
+
+Step over the current line (execute without entering functions).
+
+**Use when:**
+- Stepping through code line by line
+- Skipping function calls
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_step_over",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Stepped over"
+}
+```
+
+---
+
+### ide_step_into
+
+Step into the function at the current line.
+
+**Use when:**
+- Debugging function internals
+- Following execution into called functions
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_step_into",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Stepped into"
+}
+```
+
+---
+
+### ide_step_out
+
+Step out of the current function (return to caller).
+
+**Use when:**
+- Exiting the current function
+- Returning to the calling context
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_step_out",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Stepped out"
+}
+```
+
+---
+
+### ide_run_to_line
+
+Run execution to a specific line.
+
+**Use when:**
+- Skipping to a specific line
+- Running to a point of interest
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | Yes | File path relative to project root |
+| `line` | integer | Yes | 1-based line number to run to |
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_run_to_line",
+    "arguments": {
+      "file": "src/main/java/com/example/App.java",
+      "line": 100
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "message": "Running to line 100"
+}
+```
+
+---
+
+### ide_wait_for_pause
+
+Wait for the debugger to pause (with timeout).
+
+**Use when:**
+- Waiting for a breakpoint to be hit
+- Synchronizing with debugger state
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `timeoutSeconds` | integer | No | Timeout in seconds (default: 30, max: 300) |
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_wait_for_pause",
+    "arguments": {
+      "timeoutSeconds": 60
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "isPaused": true,
+  "pauseReason": "BREAKPOINT",
+  "currentFile": "src/main/java/com/example/App.java",
+  "currentLine": 42,
+  "message": "Debugger paused at breakpoint"
+}
+```
+
+**Pause Reasons:**
+- `BREAKPOINT` - Hit a breakpoint
+- `STEP` - After step operation
+- `PAUSE` - User paused execution
+- `EXCEPTION` - Exception thrown
+
+---
+
+### ide_get_stack_trace
+
+Get the call stack of the current debug session.
+
+**Use when:**
+- Understanding the call hierarchy
+- Navigating the stack
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_get_stack_trace",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "frames": [
+    {
+      "index": 0,
+      "file": "src/main/java/com/example/App.java",
+      "line": 42,
+      "method": "processUser",
+      "class": "com.example.App",
+      "isCurrent": true
+    },
+    {
+      "index": 1,
+      "file": "src/main/java/com/example/App.java",
+      "line": 25,
+      "method": "main",
+      "class": "com.example.App",
+      "isCurrent": false
+    }
+  ],
+  "frameCount": 2
+}
+```
+
+---
+
+### ide_list_threads
+
+List all threads in the debug session.
+
+**Use when:**
+- Viewing all running threads
+- Switching between threads
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_list_threads",
+    "arguments": {}
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "threads": [
+    {
+      "id": 1,
+      "name": "main",
+      "status": "RUNNING",
+      "isCurrent": true
+    },
+    {
+      "id": 2,
+      "name": "Thread-1",
+      "status": "WAITING",
+      "isCurrent": false
+    }
+  ],
+  "currentThreadId": 1,
+  "totalCount": 2
+}
+```
+
+**Thread Status Values:**
+- `RUNNING` - Currently executing
+- `WAITING` - Waiting for monitor
+- `TIMED_WAITING` - Waiting with timeout
+- `BLOCKED` - Blocked on monitor
+- `NEW` - Not yet started
+- `TERMINATED` - Execution completed
+
+---
+
+### ide_select_stack_frame
+
+Select a specific stack frame for variable inspection.
+
+**Use when:**
+- Inspecting variables in a different frame
+- Navigating the call stack
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `frameIndex` | integer | Yes | 0-based frame index to select |
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_select_stack_frame",
+    "arguments": {
+      "frameIndex": 1
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "selectedFrame": 1,
+  "method": "main",
+  "file": "src/main/java/com/example/App.java",
+  "line": 25,
+  "message": "Selected frame 1"
+}
+```
+
+---
+
+### ide_get_variables
+
+Get variables in the current scope.
+
+**Use when:**
+- Inspecting variable values
+- Understanding program state
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `scope` | string | No | Scope to inspect: `"local"`, `"global"`, or `"all"` (default: `"all"`) |
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_get_variables",
+    "arguments": {
+      "scope": "local"
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "variables": [
+    {
+      "name": "userId",
+      "type": "String",
+      "value": "\"user-123\"",
+      "isPrimitive": false
+    },
+    {
+      "name": "count",
+      "type": "int",
+      "value": "42",
+      "isPrimitive": true
+    }
+  ],
+  "scope": "local",
+  "frameIndex": 0
+}
+```
+
+---
+
+### ide_set_variable
+
+Set the value of a variable.
+
+**Use when:**
+- Modifying variable values during debugging
+- Testing different scenarios
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Variable name to set |
+| `value` | string | Yes | New value (as string representation) |
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_set_variable",
+    "arguments": {
+      "name": "count",
+      "value": "100"
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "name": "count",
+  "oldValue": "42",
+  "newValue": "100",
+  "message": "Variable 'count' set to 100"
+}
+```
+
+---
+
+### ide_evaluate_expression
+
+Evaluate an expression in the current debug context.
+
+**Use when:**
+- Evaluating expressions during debugging
+- Testing code snippets
+- Inspecting computed values
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `expression` | string | Yes | Expression to evaluate |
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_evaluate_expression",
+    "arguments": {
+      "expression": "userService.findById(userId).getName()"
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "result": "\"John Doe\"",
+  "type": "String",
+  "isPrimitive": false,
+  "message": "Expression evaluated successfully"
+}
+```
+
+---
+
+### ide_get_source_context
+
+Get source code context around the current execution position.
+
+**Use when:**
+- Viewing code around current line
+- Understanding execution context
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `contextLines` | integer | No | Number of lines before and after (default: 5, max: 50) |
+| `sessionId` | string | No | Session ID. If omitted, uses the current active session |
+
+**Example Request:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "ide_get_source_context",
+    "arguments": {
+      "contextLines": 3
+    }
+  }
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "file": "src/main/java/com/example/App.java",
+  "currentLine": 42,
+  "source": "39:     }\n40: \n41:     public void processUser(String id) {\n42: -->     User user = userService.findById(id);\n43:         if (user == null) {\n44:             throw new RuntimeException(\"User not found\");\n45:         }",
+  "contextLines": 3
 }
 ```
 

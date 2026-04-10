@@ -97,6 +97,32 @@ jetbrains-cli rename --file src/Foo.kt --line 10 --column 5 --new-name Bar
 | `index-status` | Check if IDE indexing is complete |
 | `sync-files` | Sync VFS/PSI cache after external file changes |
 
+### Debugger
+| Command | Description |
+|---------|-------------|
+| `debug list-configs` | List available run/debug configurations |
+| `debug start` | Start a debug session |
+| `debug stop` | Stop a debug session |
+| `debug status` | Get debug session status |
+| `debug list-sessions` | List all active debug sessions |
+| `debug list-breakpoints` | List all breakpoints |
+| `debug set-breakpoint` | Set a breakpoint |
+| `debug remove-breakpoint` | Remove a breakpoint |
+| `debug resume` | Resume execution |
+| `debug pause` | Pause execution |
+| `debug step-over` | Step over current line |
+| `debug step-into` | Step into function |
+| `debug step-out` | Step out of current function |
+| `debug run-to-line` | Run to specific line |
+| `debug wait` | Wait for debugger to pause |
+| `debug stack` | Get call stack |
+| `debug threads` | List all threads |
+| `debug select-frame` | Select a stack frame |
+| `debug variables` | Get variables in current scope |
+| `debug set-variable` | Set a variable value |
+| `debug evaluate` | Evaluate an expression |
+| `debug source` | Get source context at current position |
+
 ### Editor
 | Command | Description |
 |---------|-------------|

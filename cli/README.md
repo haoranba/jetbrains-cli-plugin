@@ -103,6 +103,31 @@ If `--project-path` is omitted and multiple projects are open, an error is retur
 - `sync-files` - Sync VFS and PSI cache
 - `build-project` - Build project
 
+### Debugger
+
+- `debug list-configs` - List run/debug configurations
+- `debug start` - Start debug session
+- `debug stop` - Stop debug session
+- `debug status` - Get session status
+- `debug list-sessions` - List active sessions
+- `debug list-breakpoints` - List breakpoints
+- `debug set-breakpoint` - Set breakpoint
+- `debug remove-breakpoint` - Remove breakpoint
+- `debug resume` - Resume execution
+- `debug pause` - Pause execution
+- `debug step-over` - Step over
+- `debug step-into` - Step into
+- `debug step-out` - Step out
+- `debug run-to-line` - Run to line
+- `debug wait` - Wait for pause
+- `debug stack` - Get call stack
+- `debug threads` - List threads
+- `debug select-frame` - Select stack frame
+- `debug variables` - Get variables
+- `debug set-variable` - Set variable value
+- `debug evaluate` - Evaluate expression
+- `debug source` - Get source context
+
 ### Editor
 
 - `read-file` - Read file content
