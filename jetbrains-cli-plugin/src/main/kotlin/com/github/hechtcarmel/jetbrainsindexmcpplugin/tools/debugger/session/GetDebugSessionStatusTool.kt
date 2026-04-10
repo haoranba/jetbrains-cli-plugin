@@ -53,13 +53,4 @@ class GetDebugSessionStatusTool : AbstractMcpTool() {
             currentThreadName = null // Thread name not directly available
         )
     }
-
-    private fun getSessionState(session: XDebugSession): String {
-        return when {
-            session.isStopped -> "STOPPED"
-            session.isPaused -> "PAUSED"
-            session.isSuspended -> "SUSPENDED"
-            else -> "RUNNING"
-        }
-    }
 }

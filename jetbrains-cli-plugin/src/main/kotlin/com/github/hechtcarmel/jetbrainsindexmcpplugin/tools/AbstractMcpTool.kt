@@ -748,4 +748,18 @@ abstract class AbstractMcpTool : McpTool {
     protected fun createSessionNotPausedResult(): ToolCallResult {
         return createErrorResult("调试会话未处于暂停状态，无法执行此操作")
     }
+
+    /**
+     * 获取调试会话的状态字符串
+     *
+     * @param session 调试会话
+     * @return 状态字符串 (STOPPED, PAUSED, RUNNING)
+     */
+    protected fun getSessionState(session: XDebugSession): String {
+        return when {
+            session.isStopped -> "STOPPED"
+            session.isPaused -> "PAUSED"
+            else -> "RUNNING"
+        }
+    }
 }

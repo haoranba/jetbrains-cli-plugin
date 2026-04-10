@@ -44,13 +44,4 @@ class ListDebugSessionsTool : AbstractMcpTool() {
             ))
         }
     }
-
-    private fun getSessionState(session: com.intellij.xdebugger.XDebugSession): String {
-        return when {
-            session.isStopped -> "STOPPED"
-            session.isPaused -> "PAUSED"
-            session.isSuspended -> "SUSPENDED"
-            else -> "RUNNING"
-        }
-    }
 }

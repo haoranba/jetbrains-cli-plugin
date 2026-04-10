@@ -36,14 +36,14 @@ class StartDebugSessionTool : AbstractMcpTool() {
         val configName = arguments[ParamNames.CONFIG_NAME]?.jsonPrimitive?.content
             ?: return createErrorResult("缺少必需参数: ${ParamNames.CONFIG_NAME}")
 
-        return readAction {
+        return edtAction {
             val runManager = RunManager.getInstance(project)
             val settings = runManager.findConfigurationByName(configName)
-                ?: return@readAction createErrorResult("未找到运行配置: $configName")
+                ?: return@edtAction createErrorResult("未找到运行配置: $configName")
 
             val executor = DefaultDebugExecutor.getDebugExecutorInstance()
             val builder = ExecutionEnvironmentBuilder.createOrNull(executor, settings)
-                ?: return@readAction createErrorResult("无法创建执行环境")
+                ?: return@edtAction createErrorResult("无法创建执行环境")
 
             try {
                 val environment = builder.build()

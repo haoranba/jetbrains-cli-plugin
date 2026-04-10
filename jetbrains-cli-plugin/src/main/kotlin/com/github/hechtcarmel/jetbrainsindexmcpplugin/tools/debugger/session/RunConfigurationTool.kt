@@ -41,16 +41,16 @@ class RunConfigurationTool : AbstractMcpTool() {
 
         val debug = arguments[ParamNames.DEBUG]?.jsonPrimitive?.content?.toBoolean() ?: true
 
-        return readAction {
+        return edtAction {
             val runManager = RunManager.getInstance(project)
             val settings = runManager.findConfigurationByName(configName)
-                ?: return@readAction createErrorResult("未找到运行配置: $configName")
+                ?: return@edtAction createErrorResult("未找到运行配置: $configName")
 
             val executor = if (debug) DefaultDebugExecutor.getDebugExecutorInstance()
                           else DefaultRunExecutor.getRunExecutorInstance()
 
             val builder = ExecutionEnvironmentBuilder.createOrNull(executor, settings)
-                ?: return@readAction createErrorResult("无法创建执行环境")
+                ?: return@edtAction createErrorResult("无法创建执行环境")
 
             try {
                 val environment = builder.build()
