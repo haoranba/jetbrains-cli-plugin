@@ -161,5 +161,4 @@ curl -X POST http://127.0.0.1:29170/api \
 
 ## License
 
-- CLI: [MIT](cli/LICENSE)
-- Plugin: [Apache 2.0](jetbrains-cli-plugin/LICENSE)
+[MIT](LICENSE)
