@@ -17,7 +17,7 @@ class SelectStackFrameTool : AbstractMcpTool() {
 
     override val description = """
         选择指定的堆栈帧作为当前帧。
-        用于检查不同层级的变量和上下文。
+        注意：由于 IntelliJ API 限制，此功能当前不可用。
     """.trimIndent()
 
     override val inputSchema: JsonObject = SchemaBuilder.tool()

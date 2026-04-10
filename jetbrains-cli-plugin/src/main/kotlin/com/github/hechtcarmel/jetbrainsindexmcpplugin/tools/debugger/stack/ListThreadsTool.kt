@@ -17,8 +17,7 @@ class ListThreadsTool : AbstractMcpTool() {
 
     override val description = """
         列出调试会话中的所有线程。
-        注意：由于 IntelliJ API 限制，当前仅返回当前暂停的线程。
-        返回线程 ID、名称、状态等信息。
+        注意：由于 IntelliJ API 限制，此功能当前不可用。
     """.trimIndent()
 
     override val inputSchema: JsonObject = SchemaBuilder.tool()
