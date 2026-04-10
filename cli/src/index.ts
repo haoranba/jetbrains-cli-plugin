@@ -28,6 +28,7 @@ import { fileStructureCommand } from "./commands/file-structure.js";
 import { convertJavaToKotlinCommand } from "./commands/convert-java-to-kotlin.js";
 import { getActiveFileCommand } from "./commands/get-active-file.js";
 import { openFileCommand } from "./commands/open-file.js";
+import { debugCommand } from "./commands/debug/index.js";
 
 const program = new Command();
 
@@ -66,6 +67,7 @@ fileStructureCommand(program);
 convertJavaToKotlinCommand(program);
 getActiveFileCommand(program);
 openFileCommand(program);
+debugCommand(program);
 
 // Global error handler for connection issues
 program.hook("preAction", async (_, actionCommand) => {
