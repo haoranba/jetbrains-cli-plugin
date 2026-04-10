@@ -17,7 +17,8 @@ class GetStackTraceTool : AbstractMcpTool() {
 
     override val description = """
         获取当前线程的调用堆栈。
-        返回堆栈帧列表，包括文件、行号、方法名等信息。
+        注意：由于 IntelliJ API 限制，当前仅返回当前堆栈帧。
+        返回堆栈帧列表，包括文件、行号等信息。
     """.trimIndent()
 
     override val inputSchema: JsonObject = SchemaBuilder.tool()

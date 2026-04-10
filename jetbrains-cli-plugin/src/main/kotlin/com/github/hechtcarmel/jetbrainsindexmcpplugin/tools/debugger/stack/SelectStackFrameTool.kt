@@ -46,9 +46,9 @@ class SelectStackFrameTool : AbstractMcpTool() {
         // This is a simplified implementation that acknowledges the limitation
         return edtAction {
             createJsonResult(SelectStackFrameResult(
-                success = true,
+                success = false,
                 frameIndex = frameIndex,
-                message = "堆栈帧选择功能需要调试器特定实现"
+                message = "堆栈帧选择功能需要调试器特定实现，当前不支持"
             ))
         }
     }

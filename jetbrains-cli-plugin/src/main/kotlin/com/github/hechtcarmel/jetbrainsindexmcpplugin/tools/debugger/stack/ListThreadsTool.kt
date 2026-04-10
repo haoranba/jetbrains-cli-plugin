@@ -17,6 +17,7 @@ class ListThreadsTool : AbstractMcpTool() {
 
     override val description = """
         列出调试会话中的所有线程。
+        注意：由于 IntelliJ API 限制，当前仅返回当前暂停的线程。
         返回线程 ID、名称、状态等信息。
     """.trimIndent()
 
@@ -39,23 +40,10 @@ class ListThreadsTool : AbstractMcpTool() {
         }
 
         return readAction {
-            val suspendContext = session.suspendContext
-            val threads = mutableListOf<ThreadInfo>()
-
-            // Note: XDebugSession and XSuspendContext don't provide direct thread enumeration
-            // This is a simplified implementation that returns basic information
-            // Full thread listing requires debugger-specific API (e.g., Java Debugger)
-            threads.add(ThreadInfo(
-                id = 0,
-                name = "Current Thread",
-                state = "SUSPENDED",
-                isCurrent = true
-            ))
-
             createJsonResult(ListThreadsResult(
-                threads = threads,
-                currentThreadId = 0,
-                totalCount = threads.size
+                threads = emptyList(),
+                currentThreadId = null,
+                totalCount = 0
             ))
         }
     }
