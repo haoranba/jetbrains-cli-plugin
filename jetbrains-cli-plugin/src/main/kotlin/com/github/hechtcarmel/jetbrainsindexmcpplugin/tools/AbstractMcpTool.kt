@@ -10,6 +10,7 @@ import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.ProjectResolver
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.models.ContentBlock
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.models.ToolCallResult
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.settings.McpSettings
+import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.DebuggerSupport
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.util.ClassResolver
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.util.ProjectUtils
 import com.intellij.openapi.application.ApplicationManager
@@ -35,6 +36,9 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import com.intellij.xdebugger.XDebugSession
+import com.intellij.xdebugger.XDebuggerManager
+import com.intellij.xdebugger.breakpoints.XBreakpointManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -43,10 +47,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
-import com.intellij.xdebugger.XDebuggerManager
-import com.intellij.xdebugger.XDebugSession
-import com.intellij.xdebugger.breakpoints.XBreakpointManager
-import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.DebuggerSupport
 
 /**
  * Abstract base class for MCP tools providing common functionality.
@@ -633,6 +633,8 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 检测当前 IDE 是否支持调试功能
+     *
+     * @return 如果支持调试功能返回 true，否则返回 false
      */
     protected fun isDebuggerSupported(): Boolean {
         return DebuggerSupport.isSupported()
@@ -640,6 +642,9 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 获取 XDebuggerManager 实例
+     *
+     * @param project 项目上下文
+     * @return 该项目的 XDebuggerManager 实例
      */
     protected fun getDebuggerManager(project: Project): XDebuggerManager {
         return XDebuggerManager.getInstance(project)
@@ -647,6 +652,9 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 获取当前（聚焦的）调试会话
+     *
+     * @param project 项目上下文
+     * @return 当前调试会话，如果没有则返回 null
      */
     protected fun getCurrentSession(project: Project): XDebugSession? {
         return getDebuggerManager(project).currentSession
@@ -654,6 +662,9 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 获取所有活动的调试会话
+     *
+     * @param project 项目上下文
+     * @return 所有活动调试会话的数组
      */
     protected fun getAllSessions(project: Project): Array<out XDebugSession> {
         return getDebuggerManager(project).debugSessions
@@ -661,6 +672,10 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 根据 ID 查找调试会话
+     *
+     * @param project 项目上下文
+     * @param sessionId 会话 ID
+     * @return 匹配的调试会话，如果未找到则返回 null
      */
     protected fun getSessionById(project: Project, sessionId: String): XDebugSession? {
         return getAllSessions(project).find { getSessionId(it) == sessionId }
@@ -668,6 +683,10 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 解析调试会话（通过 ID 或返回当前会话）
+     *
+     * @param project 项目上下文
+     * @param sessionId 会话 ID，如果为 null 则返回当前会话
+     * @return 匹配的调试会话，如果未找到则返回 null
      */
     protected fun resolveSession(project: Project, sessionId: String?): XDebugSession? {
         return if (sessionId != null) {
@@ -679,6 +698,9 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 获取会话 ID（使用 hash code 字符串）
+     *
+     * @param session 调试会话
+     * @return 会话的唯一 ID 字符串
      */
     protected fun getSessionId(session: XDebugSession): String {
         return session.hashCode().toString()
@@ -686,6 +708,9 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 获取断点管理器
+     *
+     * @param project 项目上下文
+     * @return 该项目的 XBreakpointManager 实例
      */
     protected fun getBreakpointManager(project: Project): XBreakpointManager {
         return getDebuggerManager(project).breakpointManager
@@ -693,6 +718,8 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 创建不支持调试的错误结果
+     *
+     * @return 包含不支持调试消息的错误结果
      */
     protected fun createDebuggerNotSupportedResult(): ToolCallResult {
         return createErrorResult(DebuggerSupport.NOT_SUPPORTED_MESSAGE)
@@ -700,6 +727,9 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 创建会话未找到的错误结果
+     *
+     * @param sessionId 会话 ID，如果为 null 则表示没有活动会话
+     * @return 包含会话未找到消息的错误结果
      */
     protected fun createSessionNotFoundResult(sessionId: String?): ToolCallResult {
         val msg = if (sessionId != null) {
@@ -712,6 +742,8 @@ abstract class AbstractMcpTool : McpTool {
 
     /**
      * 创建会话未暂停的错误结果
+     *
+     * @return 包含会话未暂停消息的错误结果
      */
     protected fun createSessionNotPausedResult(): ToolCallResult {
         return createErrorResult("调试会话未处于暂停状态，无法执行此操作")
