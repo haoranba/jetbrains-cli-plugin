@@ -84,4 +84,5 @@ object ParamNames {
     const val TIMEOUT_MS = "timeoutMs"
     const val BREAKPOINT_ID = "breakpointId"
     const val CONTEXT_LINES = "contextLines"
+    const val SCOPE = "scope"
 }

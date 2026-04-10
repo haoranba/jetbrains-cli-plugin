@@ -8,8 +8,11 @@ import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.models.Eval
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.schema.SchemaBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.coroutines.resume
 
 class EvaluateTool : AbstractMcpTool() {
 
@@ -18,6 +21,7 @@ class EvaluateTool : AbstractMcpTool() {
     override val description = """
         在当前调试上下文中求值表达式。
         可以计算变量值、方法调用等。
+        超时时间：5秒。
     """.trimIndent()
 
     override val inputSchema: JsonObject = SchemaBuilder.tool()
@@ -42,40 +46,44 @@ class EvaluateTool : AbstractMcpTool() {
             return createSessionNotPausedResult()
         }
 
-        return edtAction {
-            val evaluator = session.currentStackFrame?.evaluator
-                ?: return@edtAction createErrorResult("无法获取表达式求值器")
+        val evaluator = session.currentStackFrame?.evaluator
+            ?: return createErrorResult("无法获取表达式求值器")
 
-            var result: EvaluateResult? = null
+        return try {
+            val result = withTimeout(5000) {
+                evaluateAsync(evaluator, expression)
+            }
+            createJsonResult(result)
+        } catch (e: Exception) {
+            createErrorResult("表达式求值失败: ${e.message}")
+        }
+    }
 
-            evaluator.evaluate(expression, object : XDebuggerEvaluator.XEvaluationCallback {
-                override fun evaluated(resultValue: com.intellij.xdebugger.frame.XValue) {
-                    result = EvaluateResult(
+    private suspend fun evaluateAsync(
+        evaluator: XDebuggerEvaluator,
+        expression: String
+    ): EvaluateResult = suspendCancellableCoroutine { continuation ->
+        evaluator.evaluate(expression, object : XDebuggerEvaluator.XEvaluationCallback {
+            override fun evaluated(resultValue: com.intellij.xdebugger.frame.XValue) {
+                if (continuation.isActive) {
+                    continuation.resume(EvaluateResult(
                         success = true,
                         expression = expression,
                         result = resultValue.value,
                         type = resultValue.type
-                    )
+                    ))
                 }
+            }
 
-                override fun errorOccurred(errorMessage: String) {
-                    result = EvaluateResult(
+            override fun errorOccurred(errorMessage: String) {
+                if (continuation.isActive) {
+                    continuation.resume(EvaluateResult(
                         success = false,
                         expression = expression,
                         error = errorMessage
-                    )
+                    ))
                 }
-            }, null)
-
-            // Wait for result with timeout
-            var attempts = 0
-            while (result == null && attempts < 100) {
-                Thread.sleep(50)
-                attempts++
             }
-
-            result?.let { createJsonResult(it) }
-                ?: createErrorResult("表达式求值超时")
-        }
+        }, null)
     }
 }

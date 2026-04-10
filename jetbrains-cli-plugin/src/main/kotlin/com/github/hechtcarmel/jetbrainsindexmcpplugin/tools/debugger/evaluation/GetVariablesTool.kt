@@ -10,8 +10,11 @@ import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.schema.SchemaBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XValueChildrenList
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class GetVariablesTool : AbstractMcpTool() {
 
@@ -25,7 +28,7 @@ class GetVariablesTool : AbstractMcpTool() {
     override val inputSchema: JsonObject = SchemaBuilder.tool()
         .projectPath()
         .stringProperty(ParamNames.SESSION_ID, "会话 ID（可选，默认当前会话）", required = false)
-        .stringProperty("scope", "变量作用域（locals/arguments/all，默认 all）", required = false)
+        .stringProperty(ParamNames.SCOPE, "变量作用域（locals/arguments/all，默认 all）", required = false)
         .build()
 
     override suspend fun doExecute(project: Project, arguments: JsonObject): ToolCallResult {
@@ -34,7 +37,7 @@ class GetVariablesTool : AbstractMcpTool() {
         }
 
         val sessionId = arguments[ParamNames.SESSION_ID]?.jsonPrimitive?.content
-        val scope = arguments["scope"]?.jsonPrimitive?.content ?: "all"
+        val scope = arguments[ParamNames.SCOPE]?.jsonPrimitive?.content ?: "all"
 
         val session = resolveSession(project, sessionId)
             ?: return createSessionNotFoundResult(sessionId)
@@ -43,41 +46,59 @@ class GetVariablesTool : AbstractMcpTool() {
             return createSessionNotPausedResult()
         }
 
-        return readAction {
-            val currentFrame = session.currentStackFrame
-                ?: return@readAction createErrorResult("没有当前堆栈帧")
+        val currentFrame = session.currentStackFrame
+            ?: return createErrorResult("没有当前堆栈帧")
 
-            val variables = mutableListOf<VariableInfo>()
-            var completed = false
-
-            currentFrame.computeChildren(object : XCompositeNode() {
-                override fun addChildren(children: XValueChildrenList, last: Boolean) {
-                    for (i in 0 until children.size()) {
-                        val name = children.getName(i)
-                        val value = children.getValue(i)
-                        variables.add(VariableInfo(
-                            name = name,
-                            value = value.value ?: "null",
-                            type = value.type,
-                            hasChildren = value.canNavigateToSourceChildren()
-                        ))
-                    }
-                    if (last) completed = true
-                }
-
-                override fun tooManyChildren(remaining: Int) {
-                    // Handle too many children
-                }
-
-                override fun setErrorMessage(message: String) {
-                    // Handle error
-                }
-            })
+        return try {
+            val variables = getVariablesAsync(currentFrame)
 
             createJsonResult(GetVariablesResult(
                 variables = variables,
                 scope = scope
             ))
+        } catch (e: Exception) {
+            createErrorResult("获取变量失败: ${e.message}")
+        }
+    }
+
+    private suspend fun getVariablesAsync(
+        frame: com.intellij.xdebugger.frame.XStackFrame
+    ): List<VariableInfo> = suspendCancellableCoroutine { continuation ->
+        val variables = mutableListOf<VariableInfo>()
+
+        frame.computeChildren(object : XCompositeNode() {
+            override fun addChildren(children: XValueChildrenList, last: Boolean) {
+                for (i in 0 until children.size()) {
+                    val name = children.getName(i)
+                    val value = children.getValue(i)
+                    variables.add(VariableInfo(
+                        name = name,
+                        value = value.value ?: "null",
+                        type = value.type,
+                        hasChildren = value.canNavigateToSourceChildren()
+                    ))
+                }
+                if (last && continuation.isActive) {
+                    continuation.resume(variables)
+                }
+            }
+
+            override fun tooManyChildren(remaining: Int) {
+                // Still return what we have, but note truncation
+                if (continuation.isActive) {
+                    continuation.resume(variables)
+                }
+            }
+
+            override fun setErrorMessage(message: String) {
+                if (continuation.isActive) {
+                    continuation.resumeWithException(Exception(message))
+                }
+            }
+        })
+
+        continuation.invokeOnCancellation {
+            // Handle cancellation if needed
         }
     }
 }
