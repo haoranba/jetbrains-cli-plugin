@@ -1,5 +1,24 @@
 # Changelog
 
+## [4.11.0]
+
+### Added
+
+- **Debugger Tools Integration** - 22 new debugger tools for AI-assisted debugging:
+  - Session Management: list configurations, start/stop sessions, get session status
+  - Breakpoint Management: set, list, and remove breakpoints
+  - Execution Control: resume, pause, step over/into/out, run to line, wait for pause
+  - Stack & Threads: get call stack, list threads, select stack frames
+  - Variable Inspection: get/set variables, evaluate expressions, view source context
+- **CLI Debug Command Group** - 22 new CLI commands under `debug` subcommand
+- Extended `AbstractMcpTool` with debugger helper methods
+- Added debugger support detection via `DebuggerSupport` utility
+
+### Changed
+
+- Updated plugin ID to `com.github.haoranba.jetbrainsclipmcpplugin`
+- Updated vendor information
+
 ## [4.10.1]
 
 ### Changed
