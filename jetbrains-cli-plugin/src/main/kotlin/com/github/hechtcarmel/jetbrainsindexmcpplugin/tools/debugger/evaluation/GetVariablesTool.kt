@@ -7,14 +7,86 @@ import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.AbstractMcpTool
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.models.GetVariablesResult
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.models.VariableInfo
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.schema.SchemaBuilder
+import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.project.Project
+import com.intellij.ui.SimpleTextAttributes
 import com.intellij.xdebugger.frame.XCompositeNode
+import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink
+import com.intellij.xdebugger.frame.XFullValueEvaluator
+import com.intellij.xdebugger.frame.XValue
 import com.intellij.xdebugger.frame.XValueChildrenList
+import com.intellij.xdebugger.frame.XValueNode
+import com.intellij.xdebugger.frame.presentation.XValuePresentation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import javax.swing.Icon
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+
+/**
+ * Helper class to capture XValue presentation information with children flag
+ */
+private class CapturingXValueNodeWithChildren(
+    private val onResult: (String?, String?, Boolean) -> Unit
+) : XValueNode {
+
+    override fun setPresentation(icon: Icon?, type: String?, value: String, hasChildren: Boolean) {
+        onResult(value, type, hasChildren)
+    }
+
+    override fun setPresentation(icon: Icon?, presentation: XValuePresentation, hasChildren: Boolean) {
+        val buffer = StringBuilder()
+        presentation.renderValue(object : XValuePresentation.XValueTextRenderer {
+            override fun renderValue(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderValue(value: String, attributes: TextAttributesKey) {
+                buffer.append(value)
+            }
+
+            override fun renderStringValue(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderStringValue(value: String, additionalSpecialChars: String?, maxLength: Int) {
+                buffer.append(value)
+            }
+
+            override fun renderKeywordValue(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderError(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderNumericValue(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderComment(comment: String) {
+                buffer.append(comment)
+            }
+
+            override fun renderSpecialSymbol(symbol: String) {
+                buffer.append(symbol)
+            }
+        })
+        onResult(buffer.toString(), null, hasChildren)
+    }
+
+    override fun setFullValueEvaluator(fullValueEvaluator: XFullValueEvaluator) {
+        // No-op
+    }
+}
+
+private data class XValueInfo(
+    val value: String? = null,
+    val type: String? = null,
+    val hasChildren: Boolean = false
+)
 
 class GetVariablesTool : AbstractMcpTool() {
 
@@ -61,21 +133,39 @@ class GetVariablesTool : AbstractMcpTool() {
         }
     }
 
+    private fun extractXValueInfo(xValue: XValue): XValueInfo {
+        var value: String? = null
+        var type: String? = null
+        var hasChildren = false
+
+        xValue.computePresentation(
+            CapturingXValueNodeWithChildren(onResult = { v, t, hc ->
+                value = v
+                type = t
+                hasChildren = hc
+            }),
+            com.intellij.xdebugger.frame.XValuePlace.TREE
+        )
+
+        return XValueInfo(value, type, hasChildren)
+    }
+
     private suspend fun getVariablesAsync(
         frame: com.intellij.xdebugger.frame.XStackFrame
     ): List<VariableInfo> = suspendCancellableCoroutine { continuation ->
         val variables = mutableListOf<VariableInfo>()
 
-        frame.computeChildren(object : XCompositeNode() {
+        frame.computeChildren(object : XCompositeNode {
             override fun addChildren(children: XValueChildrenList, last: Boolean) {
                 for (i in 0 until children.size()) {
                     val name = children.getName(i)
                     val value = children.getValue(i)
+                    val info = extractXValueInfo(value)
                     variables.add(VariableInfo(
                         name = name,
-                        value = value.value ?: "null",
-                        type = value.type,
-                        hasChildren = value.canNavigateToSourceChildren()
+                        value = info.value ?: "null",
+                        type = info.type,
+                        hasChildren = info.hasChildren
                     ))
                 }
                 if (last && continuation.isActive) {
@@ -84,7 +174,6 @@ class GetVariablesTool : AbstractMcpTool() {
             }
 
             override fun tooManyChildren(remaining: Int) {
-                // Still return what we have, but note truncation
                 if (continuation.isActive) {
                     continuation.resume(variables)
                 }
@@ -94,6 +183,20 @@ class GetVariablesTool : AbstractMcpTool() {
                 if (continuation.isActive) {
                     continuation.resumeWithException(Exception(message))
                 }
+            }
+
+            override fun setErrorMessage(message: String, hyperlink: XDebuggerTreeNodeHyperlink?) {
+                if (continuation.isActive) {
+                    continuation.resumeWithException(Exception(message))
+                }
+            }
+
+            override fun setAlreadySorted(alreadySorted: Boolean) {
+                // No-op
+            }
+
+            override fun setMessage(message: String, icon: Icon?, attributes: SimpleTextAttributes, hyperlink: XDebuggerTreeNodeHyperlink?) {
+                // No-op
             }
         })
 

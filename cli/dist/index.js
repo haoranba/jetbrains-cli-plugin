@@ -32,6 +32,7 @@ const file_structure_js_1 = require("./commands/file-structure.js");
 const convert_java_to_kotlin_js_1 = require("./commands/convert-java-to-kotlin.js");
 const get_active_file_js_1 = require("./commands/get-active-file.js");
 const open_file_js_1 = require("./commands/open-file.js");
+const index_js_1 = require("./commands/debug/index.js");
 const program = new commander_1.Command();
 program
     .name("jetbrains-cli")
@@ -67,6 +68,7 @@ program
 (0, convert_java_to_kotlin_js_1.convertJavaToKotlinCommand)(program);
 (0, get_active_file_js_1.getActiveFileCommand)(program);
 (0, open_file_js_1.openFileCommand)(program);
+(0, index_js_1.debugCommand)(program);
 // Global error handler for connection issues
 program.hook("preAction", async (_, actionCommand) => {
     const opts = program.opts();

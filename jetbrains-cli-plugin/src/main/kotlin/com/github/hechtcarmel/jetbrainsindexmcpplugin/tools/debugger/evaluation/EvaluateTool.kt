@@ -6,13 +6,79 @@ import com.github.hechtcarmel.jetbrainsindexmcpplugin.server.models.ToolCallResu
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.AbstractMcpTool
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.models.EvaluateResult
 import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.schema.SchemaBuilder
+import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.project.Project
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
+import com.intellij.xdebugger.frame.XFullValueEvaluator
+import com.intellij.xdebugger.frame.XValue
+import com.intellij.xdebugger.frame.XValueNode
+import com.intellij.xdebugger.frame.presentation.XValuePresentation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import javax.swing.Icon
 import kotlin.coroutines.resume
+
+/**
+ * Helper class to capture XValue presentation information
+ */
+private class CapturingXValueNode(
+    private val onResult: (String?, String?) -> Unit
+) : XValueNode {
+
+    // String-based presentation (simple API)
+    override fun setPresentation(icon: Icon?, type: String?, value: String, hasChildren: Boolean) {
+        onResult(value, type)
+    }
+
+    // XValuePresentation-based presentation (new API)
+    override fun setPresentation(icon: Icon?, presentation: XValuePresentation, hasChildren: Boolean) {
+        val buffer = StringBuilder()
+        presentation.renderValue(object : XValuePresentation.XValueTextRenderer {
+            override fun renderValue(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderValue(value: String, attributes: TextAttributesKey) {
+                buffer.append(value)
+            }
+
+            override fun renderStringValue(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderStringValue(value: String, additionalSpecialChars: String?, maxLength: Int) {
+                buffer.append(value)
+            }
+
+            override fun renderKeywordValue(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderError(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderNumericValue(value: String) {
+                buffer.append(value)
+            }
+
+            override fun renderComment(comment: String) {
+                buffer.append(comment)
+            }
+
+            override fun renderSpecialSymbol(symbol: String) {
+                buffer.append(symbol)
+            }
+        })
+        onResult(buffer.toString(), null)
+    }
+
+    override fun setFullValueEvaluator(fullValueEvaluator: XFullValueEvaluator) {
+        // No-op
+    }
+}
 
 class EvaluateTool : AbstractMcpTool() {
 
@@ -64,13 +130,14 @@ class EvaluateTool : AbstractMcpTool() {
         expression: String
     ): EvaluateResult = suspendCancellableCoroutine { continuation ->
         evaluator.evaluate(expression, object : XDebuggerEvaluator.XEvaluationCallback {
-            override fun evaluated(resultValue: com.intellij.xdebugger.frame.XValue) {
+            override fun evaluated(resultValue: XValue) {
                 if (continuation.isActive) {
+                    val valueInfo = extractXValueInfo(resultValue)
                     continuation.resume(EvaluateResult(
                         success = true,
                         expression = expression,
-                        result = resultValue.value,
-                        type = resultValue.type
+                        result = valueInfo.first,
+                        type = valueInfo.second
                     ))
                 }
             }
@@ -85,5 +152,20 @@ class EvaluateTool : AbstractMcpTool() {
                 }
             }
         }, null)
+    }
+
+    private fun extractXValueInfo(xValue: XValue): Pair<String?, String?> {
+        var value: String? = null
+        var type: String? = null
+
+        xValue.computePresentation(
+            CapturingXValueNode(onResult = { v, t ->
+                value = v
+                type = t
+            }),
+            com.intellij.xdebugger.frame.XValuePlace.TREE
+        )
+
+        return Pair(value, type)
     }
 }
