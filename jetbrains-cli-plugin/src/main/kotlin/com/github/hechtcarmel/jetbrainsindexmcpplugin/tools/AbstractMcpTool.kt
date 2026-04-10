@@ -43,6 +43,10 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
+import com.intellij.xdebugger.XDebuggerManager
+import com.intellij.xdebugger.XDebugSession
+import com.intellij.xdebugger.breakpoints.XBreakpointManager
+import com.github.hechtcarmel.jetbrainsindexmcpplugin.tools.debugger.DebuggerSupport
 
 /**
  * Abstract base class for MCP tools providing common functionality.
@@ -623,5 +627,93 @@ abstract class AbstractMcpTool : McpTool {
             content = listOf(ContentBlock.Text(text = jsonText)),
             isError = false
         )
+    }
+
+    // ===== 调试器辅助方法 =====
+
+    /**
+     * 检测当前 IDE 是否支持调试功能
+     */
+    protected fun isDebuggerSupported(): Boolean {
+        return DebuggerSupport.isSupported()
+    }
+
+    /**
+     * 获取 XDebuggerManager 实例
+     */
+    protected fun getDebuggerManager(project: Project): XDebuggerManager {
+        return XDebuggerManager.getInstance(project)
+    }
+
+    /**
+     * 获取当前（聚焦的）调试会话
+     */
+    protected fun getCurrentSession(project: Project): XDebugSession? {
+        return getDebuggerManager(project).currentSession
+    }
+
+    /**
+     * 获取所有活动的调试会话
+     */
+    protected fun getAllSessions(project: Project): Array<out XDebugSession> {
+        return getDebuggerManager(project).debugSessions
+    }
+
+    /**
+     * 根据 ID 查找调试会话
+     */
+    protected fun getSessionById(project: Project, sessionId: String): XDebugSession? {
+        return getAllSessions(project).find { getSessionId(it) == sessionId }
+    }
+
+    /**
+     * 解析调试会话（通过 ID 或返回当前会话）
+     */
+    protected fun resolveSession(project: Project, sessionId: String?): XDebugSession? {
+        return if (sessionId != null) {
+            getSessionById(project, sessionId)
+        } else {
+            getCurrentSession(project)
+        }
+    }
+
+    /**
+     * 获取会话 ID（使用 hash code 字符串）
+     */
+    protected fun getSessionId(session: XDebugSession): String {
+        return session.hashCode().toString()
+    }
+
+    /**
+     * 获取断点管理器
+     */
+    protected fun getBreakpointManager(project: Project): XBreakpointManager {
+        return getDebuggerManager(project).breakpointManager
+    }
+
+    /**
+     * 创建不支持调试的错误结果
+     */
+    protected fun createDebuggerNotSupportedResult(): ToolCallResult {
+        return createErrorResult(DebuggerSupport.NOT_SUPPORTED_MESSAGE)
+    }
+
+    /**
+     * 创建会话未找到的错误结果
+     */
+    protected fun createSessionNotFoundResult(sessionId: String?): ToolCallResult {
+        val msg = if (sessionId != null) {
+            "未找到调试会话: $sessionId"
+        } else {
+            "没有活动的调试会话"
+        }
+        return createErrorResult(msg)
+    }
+
+    /**
+     * 创建会话未暂停的错误结果
+     */
+    protected fun createSessionNotPausedResult(): ToolCallResult {
+        return createErrorResult("调试会话未处于暂停状态，无法执行此操作")
     }
 }
