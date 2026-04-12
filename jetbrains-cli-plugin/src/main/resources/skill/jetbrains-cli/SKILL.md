@@ -36,7 +36,7 @@ jetbrains-cli sync-files
 | 按名搜索类（项目内） | `find-class --query UserService` | Glob |
 | 搜索 JAR/依赖库中的类 | `find-class --query ArrayList --include-libraries` | 无法用 grep |
 | 读 JAR/库的反编译源码 | `read-file --file <find-class 返回的 jar 路径>` | Read（只能读本地文件） |
-| 类型继承层级 | `type-hierarchy --class com.example.MyClass` | 无等价工具 |
+| 类型继承层级 | `type-hierarchy --symbol com.example.MyClass` 或 `--file f --line l --column c` | 无等价工具 |
 | 调用链（谁调用我） | `call-hierarchy --file f --line l --column c --direction callers` | 无等价工具 |
 | 找接口实现 | `find-implementations --file f --line l --column c` | 无等价工具 |
 | 找父方法 | `find-super-methods --file f --line l --column c` | 无等价工具 |

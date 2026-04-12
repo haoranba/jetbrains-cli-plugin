@@ -12,6 +12,7 @@ export function callHierarchyCommand(program: Command) {
     .option("--column <column>", "Column number (1-based)")
     .option("--language <language>", "Language filter")
     .option("--symbol <symbol>", "Symbol name (alternative to file/line/column)")
+    .requiredOption("--direction <direction>", "Call direction: callers or callees")
     .action(async (options, cmd) => {
       const opts = cmd.parent.opts();
       const client = new JetbrainsClient({
@@ -26,6 +27,7 @@ export function callHierarchyCommand(program: Command) {
       if (options.column) args.column = parseInt(options.column);
       if (options.language) args.language = options.language;
       if (options.symbol) args.symbol = options.symbol;
+      args.direction = options.direction;
 
       const response = await client.callTool("ide_call_hierarchy", args);
 
