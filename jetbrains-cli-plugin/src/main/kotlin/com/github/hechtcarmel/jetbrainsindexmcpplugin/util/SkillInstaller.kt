@@ -18,12 +18,11 @@ object SkillInstaller {
 
     private val LOG = logger<SkillInstaller>()
 
-    private const val SKILL_NAME = "ide-index-mcp"
+    private const val SKILL_NAME = "jetbrains-cli"
     private const val RESOURCE_BASE = "/skill/$SKILL_NAME"
 
     private val SKILL_FILES = listOf(
-        "SKILL.md",
-        "references/tools-reference.md"
+        "SKILL.md"
     )
 
     /**
