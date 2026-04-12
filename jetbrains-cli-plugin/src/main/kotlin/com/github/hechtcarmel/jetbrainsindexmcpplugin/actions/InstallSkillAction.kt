@@ -217,12 +217,12 @@ class InstallSkillAction : AnAction() {
     private fun saveAsFile(project: Project?, extension: String) {
         val descriptor = FileSaverDescriptor(
             "Save Companion Skill",
-            "Save the IDE Index MCP companion skill",
+            "Save the jetbrains-cli companion skill",
             extension
         )
 
         val dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, project)
-        val wrapper = dialog.save(null as VirtualFile?, "ide-index-mcp")
+        val wrapper = dialog.save(null as VirtualFile?, "jetbrains-cli")
 
         wrapper?.let { vfw ->
             val file = vfw.file
