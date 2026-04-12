@@ -62,7 +62,7 @@ object SkillInstaller {
 
     /**
      * Writes the skill as a zip archive to the given output file.
-     * The zip contains: ide-index-mcp/SKILL.md, ide-index-mcp/references/tools-reference.md
+     * The zip contains: jetbrains-cli/SKILL.md
      *
      * @param outputFile Target file (.skill or .zip)
      * @return true on success
