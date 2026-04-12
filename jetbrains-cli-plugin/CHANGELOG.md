@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- Updated SkillInstaller to use jetbrains-cli skill
+- Updated InstallSkillAction UI text for jetbrains-cli skill
+- Rewrote jetbrains-cli SKILL.md with decision table and debug workflow
+
+### Fixed
+- Fixed call-hierarchy --direction and type-hierarchy --symbol flags in SKILL.md and CLI
+
+### Removed
+- Removed deprecated ide-index-mcp skill resources
+
 ## [1.0.0]
 
 ### Overview
