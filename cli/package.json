@@ -1,5 +1,5 @@
 {
-  "name": "jetbrains-cli",
+  "name": "@antcli/jetbrains-cli",
   "version": "1.0.0",
   "description": "CLI tool for JetBrains IDE code intelligence",
   "main": "dist/index.js",
@@ -11,6 +11,10 @@
     "dev": "tsc --watch",
     "start": "node dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "keywords": [
     "jetbrains",
     "cli",
@@ -25,5 +29,8 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.antgroup-inc.cn"
   }
 }
