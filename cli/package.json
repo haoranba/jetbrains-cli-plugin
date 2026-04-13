@@ -1,5 +1,5 @@
 {
-  "name": "@antcli/jetbrains-cli",
+  "name": "@alipay/jetbrains-cli",
   "version": "1.1.0",
   "description": "CLI tool for JetBrains IDE code intelligence",
   "main": "dist/index.js",
